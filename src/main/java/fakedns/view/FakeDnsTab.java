@@ -2,6 +2,7 @@ package fakedns.view;
 
 import burp.BurpExtension;
 import burp.api.montoya.MontoyaApi;
+import extend.util.external.NetUtil;
 import java.awt.Component;
 import extension.burp.IBurpTab;
 import extension.helpers.IpUtil;
@@ -12,12 +13,17 @@ import fakedns.model.HostNameItem;
 import fakedns.model.FakeDnsProperty;
 import fakedns.server.DnsHandler;
 import fakedns.server.SimpleDnsServer;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.BindException;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JToggleButton;
 import javax.swing.event.ListSelectionEvent;
@@ -31,6 +37,8 @@ import javax.swing.table.DefaultTableModel;
 public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
 
     private final static Logger logger = Logger.getLogger(FakeDnsTab.class.getName());
+
+    private final static java.util.ResourceBundle RELEASE = java.util.ResourceBundle.getBundle("burp/resources/release");
 
     /**
      * Creates new form FakeDnsPanel
@@ -49,29 +57,46 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        popupInterface = new javax.swing.JPopupMenu();
         tglStartServer = new javax.swing.JToggleButton();
-        lblFakeIP = new javax.swing.JLabel();
+        lblExceptionMessage = new javax.swing.JLabel();
+        lblBindIntarface = new javax.swing.JLabel();
         txtBindInterface = new javax.swing.JTextField();
+        btnInterfaces = new javax.swing.JButton();
+        lblFakeIP = new javax.swing.JLabel();
+        txtFakeIP = new javax.swing.JTextField();
+        chkResolvSystemHost = new javax.swing.JCheckBox();
+        chkResolvBurpHost = new javax.swing.JCheckBox();
         lblFakeDomain = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblFakeDomains = new javax.swing.JTable();
         btnPasteDomain = new javax.swing.JButton();
         btnAddAllDomain = new javax.swing.JButton();
+        btnAddDomain = new javax.swing.JButton();
         btnEditDomain = new javax.swing.JButton();
         btnRemoveDomain = new javax.swing.JButton();
-        lblBindIntarface = new javax.swing.JLabel();
-        txtFakeIP = new javax.swing.JTextField();
-        lblExceptionMessage = new javax.swing.JLabel();
-        btnAddDomain = new javax.swing.JButton();
         btnRemoveAllDomain = new javax.swing.JButton();
         lblFakeServers = new javax.swing.JLabel();
         txtFakeServers = new javax.swing.JTextField();
+
+        setPreferredSize(new java.awt.Dimension(800, 600));
 
         tglStartServer.setText("Start");
         tglStartServer.addChangeListener(this::tglStartServerStateChanged);
         tglStartServer.addActionListener(this::tglStartServerActionPerformed);
 
+        lblBindIntarface.setText("Bind Interface:");
+
+        btnInterfaces.setText("▼");
+        btnInterfaces.addActionListener(this::btnInterfacesActionPerformed);
+
         lblFakeIP.setText("Fake IP:");
+
+        chkResolvSystemHost.setText("resolv system hosts");
+        chkResolvSystemHost.addActionListener(this::chkResolvSystemHostActionPerformed);
+
+        chkResolvBurpHost.setText("resolv burp hosts");
+        chkResolvBurpHost.addChangeListener(this::chkResolvBurpHostStateChanged);
 
         lblFakeDomain.setText("Fake Domains:");
 
@@ -109,80 +134,89 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
         btnAddAllDomain.setText("Add All");
         btnAddAllDomain.addActionListener(this::btnAddAllDomainActionPerformed);
 
+        btnAddDomain.setText("Add");
+        btnAddDomain.addActionListener(this::btnAddDomainActionPerformed);
+
         btnEditDomain.setText("Edit");
         btnEditDomain.addActionListener(this::btnEditDomainActionPerformed);
 
         btnRemoveDomain.setText("Remove");
         btnRemoveDomain.addActionListener(this::btnRemoveDomainActionPerformed);
 
-        lblBindIntarface.setText("Bind Interface:");
-
-        btnAddDomain.setText("Add");
-        btnAddDomain.addActionListener(this::btnAddDomainActionPerformed);
-
         btnRemoveAllDomain.setText("Remove All");
         btnRemoveAllDomain.addActionListener(this::btnRemoveAllDomainActionPerformed);
 
         lblFakeServers.setText("Name Servers:");
+
+        txtFakeServers.addActionListener(this::txtFakeServersActionPerformed);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(tglStartServer, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblBindIntarface, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblFakeIP, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblFakeServers, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblFakeDomain, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnPasteDomain, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnAddAllDomain, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnAddDomain, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnEditDomain, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnRemoveDomain, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnRemoveAllDomain, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(6, 6, 6)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addComponent(lblFakeIP, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(lblFakeServers, javax.swing.GroupLayout.DEFAULT_SIZE, 108, Short.MAX_VALUE))
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addComponent(tglStartServer, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(lblFakeDomain, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(btnRemoveDomain, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(btnRemoveAllDomain, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(btnEditDomain, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(btnAddDomain, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(btnAddAllDomain, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(btnPasteDomain, javax.swing.GroupLayout.DEFAULT_SIZE, 108, Short.MAX_VALUE)
-                                .addComponent(lblBindIntarface, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1142, Short.MAX_VALUE)
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addComponent(txtFakeServers, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)
+                                .addComponent(txtFakeServers, javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(txtFakeIP, javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(txtBindInterface, javax.swing.GroupLayout.Alignment.LEADING))))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(125, 125, 125)
-                        .addComponent(lblExceptionMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 298, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
+                                .addGroup(layout.createSequentialGroup()
+                                    .addComponent(chkResolvBurpHost, javax.swing.GroupLayout.DEFAULT_SIZE, 204, Short.MAX_VALUE)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(chkResolvSystemHost, javax.swing.GroupLayout.DEFAULT_SIZE, 214, Short.MAX_VALUE)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(lblExceptionMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 424, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtBindInterface, javax.swing.GroupLayout.PREFERRED_SIZE, 424, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnInterfaces)))
+                        .addGap(60, 222, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(jScrollPane1)
+                        .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(tglStartServer)
-                    .addComponent(lblExceptionMessage))
+                    .addComponent(lblExceptionMessage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblBindIntarface)
-                    .addComponent(txtBindInterface, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtBindInterface, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnInterfaces))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblFakeIP)
                     .addComponent(txtFakeIP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(9, 9, 9)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblFakeServers)
                     .addComponent(txtFakeServers, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(lblFakeDomain)
+                .addGap(9, 9, 9)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblFakeDomain)
+                    .addComponent(chkResolvSystemHost)
+                    .addComponent(chkResolvBurpHost))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnPasteDomain)
                         .addGap(18, 18, 18)
@@ -194,8 +228,9 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnRemoveDomain)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnRemoveAllDomain, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(btnRemoveAllDomain, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(11, Short.MAX_VALUE))
         );
 
         tglStartServer.getAccessibleContext().setAccessibleDescription("");
@@ -302,6 +337,25 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
         this.firePropertyChange(FakeDnsProperty.FAKEDNS_PROPERTY, null, this.getProperty());
     }//GEN-LAST:event_btnRemoveAllDomainActionPerformed
 
+    private void chkResolvBurpHostStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_chkResolvBurpHostStateChanged
+        this.firePropertyChange(FakeDnsProperty.FAKEDNS_PROPERTY, null, this.getProperty());
+    }//GEN-LAST:event_chkResolvBurpHostStateChanged
+
+    private void chkResolvSystemHostActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkResolvSystemHostActionPerformed
+        this.firePropertyChange(FakeDnsProperty.FAKEDNS_PROPERTY, null, this.getProperty());
+    }//GEN-LAST:event_chkResolvSystemHostActionPerformed
+
+    private void btnInterfacesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInterfacesActionPerformed
+        this.updatePopupMenuUI();
+        Point pt = this.btnInterfaces.getLocation();
+        this.popupInterface.show(this, pt.x, pt.y + this.btnInterfaces.getHeight());
+
+    }//GEN-LAST:event_btnInterfacesActionPerformed
+
+    private void txtFakeServersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtFakeServersActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtFakeServersActionPerformed
+
     private CustomTableModel modelFakeDomains = null;
 
     @SuppressWarnings("unchecked")
@@ -344,6 +398,23 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
 
     }
 
+    private void updatePopupMenuUI() {
+        this.popupInterface.removeAll();
+        List<InetAddress> inetList = NetUtil.getNetworkInterfaces();
+        for (int i = 0; i < inetList.size(); i++) {
+            JMenuItem item = new JMenuItem(inetList.get(i).getHostAddress());
+            this.popupInterface.add(item);
+            item.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if (e.getSource() instanceof JMenuItem item) {
+                        txtBindInterface.setText(item.getText());
+                    }
+                }
+            });
+        }
+    }
+
     @Override
     public String getTabCaption() {
         return "Fake DNS";
@@ -358,15 +429,19 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
     private javax.swing.JButton btnAddAllDomain;
     private javax.swing.JButton btnAddDomain;
     private javax.swing.JButton btnEditDomain;
+    private javax.swing.JButton btnInterfaces;
     private javax.swing.JButton btnPasteDomain;
     private javax.swing.JButton btnRemoveAllDomain;
     private javax.swing.JButton btnRemoveDomain;
+    private javax.swing.JCheckBox chkResolvBurpHost;
+    private javax.swing.JCheckBox chkResolvSystemHost;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblBindIntarface;
     private javax.swing.JLabel lblExceptionMessage;
     private javax.swing.JLabel lblFakeDomain;
     private javax.swing.JLabel lblFakeIP;
     private javax.swing.JLabel lblFakeServers;
+    private javax.swing.JPopupMenu popupInterface;
     private javax.swing.JTable tblFakeDomains;
     private javax.swing.JToggleButton tglStartServer;
     private javax.swing.JTextField txtBindInterface;
@@ -378,6 +453,9 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
         this.txtBindInterface.setText(property.getBindInterface());
         this.txtFakeIP.setText(property.getFakeIP());
         setFakeDomains(property.getFakeDomains());
+        setNameServers(property.getNameServers());
+        this.chkResolvBurpHost.setSelected(property.isResolvBurpHosts());
+        this.chkResolvSystemHost.setSelected(property.isResolvSystemHosts());
     }
 
     public FakeDnsProperty getProperty() {
@@ -386,7 +464,13 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
         property.setFakeIP(this.txtFakeIP.getText());
         property.setFakeDomains(this.getFakeDomains());
         property.setNameServers(this.getNameServers());
+        property.setResolvBurpHosts(this.chkResolvBurpHost.isSelected());
+        property.setResolvSystemHosts(this.chkResolvSystemHost.isSelected());
         return property;
+    }
+
+    public void setStandalone(boolean value) {
+        this.chkResolvBurpHost.setEnabled(!value);
     }
 
     private final HostEntryItemDlg hostEntryItemDlg = new HostEntryItemDlg(null, true);
@@ -473,6 +557,10 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
         }
     }
 
+    private void setNameServers(List<HostNameItem> nameServers) {
+        this.txtFakeServers.setText(StringUtil.join(",", nameServers));
+    }
+
     private List<HostNameItem> getNameServers() {
         final List<HostNameItem> list = HostNameItem.parseHostList(this.txtFakeServers.getText());
         return list;
@@ -494,6 +582,5 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
     public void setErrorMessage(String message) {
         this.lblExceptionMessage.setText(message);
     }
-
 
 }

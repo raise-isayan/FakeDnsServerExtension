@@ -28,6 +28,7 @@ public class FakeDnsProperty implements FakeDnsOption, IPropertyConfig {
         this.bindInterface = bindInterface;
     }
 
+    @Override
     public String getBindInterface() {
         return this.bindInterface;
     }
@@ -39,6 +40,7 @@ public class FakeDnsProperty implements FakeDnsOption, IPropertyConfig {
         this.fakeIP = fakeIP;
     }
 
+    @Override
     public String getFakeIP() {
         return this.fakeIP;
     }
@@ -46,6 +48,7 @@ public class FakeDnsProperty implements FakeDnsOption, IPropertyConfig {
     @Expose
     private final List<HostNameItem> fakeDomains = new ArrayList<>();
 
+    @Override
     public List<HostNameItem> getFakeDomains() {
         return this.fakeDomains;
     }
@@ -68,6 +71,7 @@ public class FakeDnsProperty implements FakeDnsOption, IPropertyConfig {
         this.nameServers.addAll(nameServers);
     }
 
+    @Expose
     private int dnsPort = 53;
 
     @Override
@@ -79,7 +83,7 @@ public class FakeDnsProperty implements FakeDnsOption, IPropertyConfig {
         this.dnsPort = dnsPort;
     }
 
-    private int dnsTTL = 60;
+    private int dnsTTL = 15;
 
     @Override
     public int getDnsTTL() {
@@ -107,6 +111,34 @@ public class FakeDnsProperty implements FakeDnsOption, IPropertyConfig {
         this.burpHosts = burpHosts;
     }
 
+    public HostName getBurpHosts() {
+        return this.burpHosts;
+    }
+
+    @Expose
+    private boolean resolvSystemHosts = true;
+
+    public void setResolvSystemHosts(boolean resolvSystemHosts) {
+        this.resolvSystemHosts = resolvSystemHosts;
+    }
+
+    @Override
+    public boolean isResolvSystemHosts() {
+        return this.resolvSystemHosts;
+    }
+
+    @Expose
+    private boolean resolvBurpHosts = true;
+
+    public void setResolvBurpHosts(boolean resolvBurpHosts) {
+        this.resolvBurpHosts = resolvBurpHosts;
+    }
+
+    @Override
+    public boolean isResolvBurpHosts() {
+        return this.resolvBurpHosts;
+    }
+
     public void setProperty(FakeDnsProperty property) {
         this.bindInterface = property.bindInterface;
         this.fakeIP = property.fakeIP;
@@ -114,6 +146,8 @@ public class FakeDnsProperty implements FakeDnsOption, IPropertyConfig {
         this.setNameServers(property.nameServers);;
         this.dnsPort = property.dnsPort;
         this.dnsTTL = property.dnsTTL;
+        this.resolvBurpHosts = property.resolvBurpHosts;
+        this.resolvSystemHosts = property.resolvSystemHosts;
     }
 
     @Override

@@ -47,23 +47,36 @@ Name servers::
 Fake Domains::
   偽装ドメインを指定します。
 
+resolv burp hosts::
+   この設定を有効にすると、ホスト名の解決はBurp Suiteのhosts設定に基づいて行われます。デフォルトでは、この設定は有効になっています。
+
+resolv system hosts::
+    この設定を有効にすると、ホスト名の解決はOSのhosts設定に基づいて行われます。デフォルトでは、この設定は有効になっています。
+
 ## CLI オプション
 
 コマンドラインで起動するCLIモードが存在します。
 
 ````
-Usage: java -jar FakeDnsServerExtension.jar [option] [-i <interface>] [--fakeip <fakeip>] [--fakedomains <FakeDomains>] [--nameservers <NameServers>] [--dnsport <dnPport>]
+java -jar FakeDnsServerExtension-v0.2.jar -h
+
+Usage: java -jar FakeDnsServerExtension.jar [option] [-i, --interface <interface>] [--fakeip <fakeip>] [--fakedomains <FakeDomains>] [--nameservers <NameServers>] [-p, --port <dnPport>]
 [option]
         -h - help show
+        -h - version show
         -gui - GUI Mode
 [command]
-        -i <interface> - Specify the interface.
+        -i, --interface <interface> - Specify the interface IP address.
         --fakeip <fakeip> - Specify the IP address to spoof
         --fakedomains <FakeDomains> - Specify the domain to spoof
         --nameservers <NameServers>  - Specify the name server
-        --port <dnsPort> - Specify the DNS port
-
+        --p, -port <dnsPort> - Specify the DNS port
+        --disable-system-hosts - Disable DNS name resolution using the system hosts file
 ````
+
+#### CAUTION:
+
+コマンドラインモード時は、resolv burp hosts は常に無効です。
 
 ## GUI オプション
 

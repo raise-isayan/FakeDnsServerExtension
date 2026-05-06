@@ -47,22 +47,36 @@ Name servers::
 Fake Domains::
   Specify the DNS port
 
+resolv burp hosts::
+   If you enable this setting, hostname resolution will be based on the hosts configuration in Burp Suite. By default, this setting is enabled.
+
+resolv system hosts::
+   If you enable this setting, hostname resolution will be based on the OS hosts file. By default, this setting is enabled.
+
 ## CLI Option
 
 There is a CLI mode that can be launched from the command line.
 
 ````
-Usage: java -jar FakeDnsServerExtension.jar [option] [-i <interface>] [--fakeip <fakeip>] [--fakedomains <FakeDomains>] [--nameservers <NameServers>] [--dnsport <dnPport>]
+java -jar FakeDnsServerExtension-v0.2.jar -h
+
+Usage: java -jar FakeDnsServerExtension.jar [option] [-i, --interface <interface>] [--fakeip <fakeip>] [--fakedomains <FakeDomains>] [--nameservers <NameServers>] [-p, --port <dnPport>]
 [option]
         -h - help show
+        -h - version show
         -gui - GUI Mode
 [command]
-        -i <interface> - Specify the bind interface.
+        -i, --interface <interface> - Specify the interface IP address.
         --fakeip <fakeip> - Specify the IP address to spoof
         --fakedomains <FakeDomains> - Specify the domain to spoof
         --nameservers <NameServers>  - Specify the name server
-        --port <dnsPort> - Specify the DNS port
+        --p, -port <dnsPort> - Specify the DNS port
+        --disable-system-hosts - Disable DNS name resolution using the system hosts file
 ````
+
+#### CAUTION:
+
+In command-line mode, `resolv burp hosts` is always disabled.
 
 ## GUI Option
 

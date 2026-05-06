@@ -42,16 +42,19 @@ public class SimpleDnsServer {
 
     private static void usage() {
         System.out.println("");
-        System.out.println(String.format("Usage: java -jar %s.jar [option] [-i <interface>] [--fakeip <fakeip>] [--fakedomains <FakeDomains>] [--nameservers <NameServers>] [--dnsport <dnPport>]", RELEASE.getString("projname")));
+        System.out.println(String.format("Usage: java -jar %s.jar [option] [-i, --interface <interface>] [--fakeip <fakeip>] [--fakedomains <FakeDomains>] [--nameservers <NameServers>] [-p, --port <dnPport>]", RELEASE.getString("projname")));
         System.out.println("[option]");
         System.out.println("\t-h - help show");
+        System.out.println("\t-h - version show");
         System.out.println("\t-gui - GUI Mode ");
         System.out.println("[command]");
-        System.out.println("\t-i <interface> - Specify the interface.");
+        System.out.println("\t-i, --interface <interface> - Specify the interface IP address.");
         System.out.println("\t--fakeip <fakeip> - Specify the IP address to spoof");
         System.out.println("\t--fakedomains <FakeDomains> - Specify the domain to spoof");
         System.out.println("\t--nameservers <NameServers>  - Specify the name server");
-        System.out.println("\t--port <dnsPort> - Specify the DNS port");
+        System.out.println("\t--p, -port <dnsPort> - Specify the DNS port");
+        System.out.println("\t--disable-system-hosts - Disable DNS name resolution using the system hosts file");
+//        System.out.println("\t--disable-burp-hosts - Disable DNS name resolution using the burp hosts file");
         System.out.println("");
     }
 
@@ -68,9 +71,11 @@ public class SimpleDnsServer {
     /*
         args = new String[]{"-gui"};
         args = new String[]{"-i","192.168.137.1", "--fakeip", "192.168.137.1", "--fakedomains", "www.example.com,www.example.jp"};
-    */
+     */
     public static void main(String[] args) {
         final FakeDnsProperty fakeDnsOption = new FakeDnsProperty();
+
+        args = new String[]{"-gui"};
 
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
@@ -88,8 +93,17 @@ public class SimpleDnsServer {
                     EventQueue.invokeLater(MainPanel::createAndShowGui);
                     return;
                 }
+                case "--disable-system-hosts": {
+                    fakeDnsOption.setResolvSystemHosts(false);
+                    break;
+                }
+//                case "--disable-burp-hosts": {
+//                    fakeDnsOption.setResolvBurpHosts(false);
+//                    break;
+//                }
                 // --- 引数ありのオプション ---
-                case "-i": {
+                case "-i":
+                case "--interface": {
                     if (i + 1 < args.length) {
                         fakeDnsOption.setBindInterface(args[++i]);
                     } else {
@@ -171,6 +185,9 @@ public class SimpleDnsServer {
         if (!fakeDnsOption.getNameServers().isEmpty()) {
             System.out.println("NameServers:" + StringUtil.join(",", HostNameItem.toStringArray(fakeDnsOption.getNameServers())));
         }
+        // CLI の場合は常に無効
+        fakeDnsOption.setResolvBurpHosts(false);
+
         // ハンドラー（Runnable）を作成
         SimpleDnsServer dnsServer = new SimpleDnsServer();
         dnsServer.setFakeDnsOption(fakeDnsOption);
@@ -244,8 +261,9 @@ public class SimpleDnsServer {
                 }
             }
         }
-        this.getFakeDnsOption().setBurpHosts(HostName.getInstance(burpHostList));
-        DnsHandler dnsHandler = new DnsHandler(this.getFakeDnsOption());
+        FakeDnsProperty option = this.getFakeDnsOption();
+        option.setBurpHosts(HostName.getInstance(burpHostList));
+        DnsHandler dnsHandler = new DnsHandler(option);
         dnsHandler.setExceptionHandler(this.getExceptionHandler());
 
         // スレッドを作成して開始
@@ -277,7 +295,6 @@ public class SimpleDnsServer {
         this.dnsServer = null;
     }
 
-
     private DnsHandler.MessageHandler messageHandler = null;
 
     public DnsHandler.MessageHandler getExceptionHandler() {
@@ -288,19 +305,19 @@ public class SimpleDnsServer {
         this.messageHandler = exceptionHandler;
     }
 
-
     private final static class MainPanel extends JPanel {
 
         private final FakeDnsTab fakeDnsTab = new FakeDnsTab();
 
         private MainPanel() {
             super(new BorderLayout());
-            Preferences pref = BurpPreferences.extensions(getProjectName());
+            Preferences pref = BurpPreferences.extensions(SimpleDnsServer.getProjectName());
             FakeDnsProperty option = new FakeDnsProperty();
             option.saveSetting(pref.getString(option.getSettingName()));
             this.fakeDnsTab.setProperty(option);
+            this.fakeDnsTab.setStandalone(true);
             this.add(this.fakeDnsTab, BorderLayout.CENTER);
-            setPreferredSize(new Dimension(800, 800));
+            setPreferredSize(new Dimension(800, 600));
         }
 
         private static void createAndShowGui() {
@@ -317,7 +334,7 @@ public class SimpleDnsServer {
                     @Override
                     public void windowClosing(WindowEvent e) {
                         FakeDnsProperty option = main.fakeDnsTab.getProperty();
-                        Preferences pref = BurpPreferences.extensions(getProjectName());
+                        Preferences pref = BurpPreferences.extensions(SimpleDnsServer.getProjectName());
                         pref.setString(option.getSettingName(), option.loadSetting());
                     }
                 });

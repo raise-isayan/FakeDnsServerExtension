@@ -1,4 +1,4 @@
-package burp;
+    package burp;
 
 import burp.api.montoya.MontoyaApi;
 import burp.api.montoya.extension.ExtensionUnloadingHandler;

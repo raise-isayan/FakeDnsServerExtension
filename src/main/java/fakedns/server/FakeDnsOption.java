@@ -25,5 +25,9 @@ public interface FakeDnsOption {
 
     public int getDnsTTL();
 
+    public boolean isResolvSystemHosts();
+
+    public boolean isResolvBurpHosts();
+
 
 }

@@ -1,6 +1,7 @@
 package fakedns.server;
 
 import extension.burp.HostName;
+import fakedns.model.FakeDnsProperty;
 import fakedns.model.HostNameItem;
 import java.io.File;
 import org.xbill.DNS.*;
@@ -24,6 +25,10 @@ import org.xbill.DNS.hosts.HostsFileParser;
 public class DnsHandler implements Runnable {
 
     private final static Logger logger = Logger.getLogger(DnsHandler.class.getName());
+
+    private final static java.util.ResourceBundle RELEASE = java.util.ResourceBundle.getBundle("burp/resources/release");
+
+    private static final int UDP_SIZE = 512;
 
     public static enum DnsResolv {
         FAKE_DOMAIN, SYSTEM_HOSTS, BURP_HOSTS
@@ -53,15 +58,19 @@ public class DnsHandler implements Runnable {
         this.hostsParser = new HostsFileParser(hostsFile.toPath());
     }
 
+    private String getLogName() {
+        return "[" + FakeDnsProperty.FAKEDNS_PROPERTY + "] ";
+    }
+
     public void run() {
         InetSocketAddress bindAddress = new InetSocketAddress(this.option.getBindInterface(), option.getDnsPort());
         try (DatagramSocket socket = new DatagramSocket(null)) {
             socket.setReuseAddress(true);
             socket.bind(bindAddress);
             if (this.messageHandler != null) {
-                this.messageHandler.message("[DNS-Thread] Accept DNS: " + bindAddress.getHostString() + ":" + bindAddress.getPort());
+                this.messageHandler.message(getLogName() + "Accept DNS: " + bindAddress.getHostString() + ":" + bindAddress.getPort());
             }
-            byte[] buffer = new byte[512];
+            byte[] buffer = new byte[UDP_SIZE];
 
             while (!Thread.currentThread().isInterrupted()) {
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
@@ -80,33 +89,37 @@ public class DnsHandler implements Runnable {
                 List<HostNameItem> fakeDomains = this.option.getFakeDomains();
                 if (fakeDomains.stream().anyMatch(predicate -> predicate.isEnable() && predicate.getHostName().equalsIgnoreCase(queryName.toString(true)))) {
                     // 偽装処理
-                    response = createResponse(query, question, InetAddress.getByName(this.option.getFakeIP()), DnsResolv.FAKE_DOMAIN);
+                    response = this.createResponse(query, question, InetAddress.getByName(this.option.getFakeIP()), DnsResolv.FAKE_DOMAIN);
                     if (this.messageHandler != null) {
-                        this.messageHandler.message("[DNS-Thread] FakeIP: " + queryName.toString(true) + "(" + this.option.getFakeIP() + ")");
+                        this.messageHandler.message(getLogName() + "FakeIP: " + queryName.toString(true) + "(" + this.option.getFakeIP() + ")");
                     }
                 } else {
                     // Burp のHost
-                    Optional<InetAddress> burpHostIP = this.option.getBurpAddressForHost(queryName.toString(true));
-                    if (burpHostIP.isPresent()) {
-                        if (this.messageHandler != null) {
-                            this.messageHandler.message("[DNS-Thread] burp hosts: " + queryName.toString(true) + "(" + burpHostIP.get() + ")");
+                    if (response == null && this.option.isResolvBurpHosts()) {
+                        Optional<InetAddress> burpHostIP = this.option.getBurpAddressForHost(queryName.toString(true));
+                        if (burpHostIP.isPresent()) {
+                            if (this.messageHandler != null) {
+                                this.messageHandler.message(getLogName() + "resolv burp hosts: " + queryName.toString(true) + "(" + burpHostIP.get() + ")");
+                            }
+                            response = this.createResponse(query, question, burpHostIP.get(), DnsResolv.BURP_HOSTS);
                         }
-                        response = createResponse(query, question, burpHostIP.get(), DnsResolv.BURP_HOSTS);
-                    } else {
+                    }
+                    if (response == null && this.option.isResolvSystemHosts()) {
                         // OS の hosts ファイルを確認
                         Optional<InetAddress> systemHostIP = hostsParser.getAddressForHost(queryName, Address.IPv4);
                         if (systemHostIP.isPresent()) {
                             if (this.messageHandler != null) {
-                                this.messageHandler.message("[DNS-Thread] system hosts: " + queryName.toString(true) + "(" + systemHostIP.get() + ")");
+                                this.messageHandler.message(getLogName() + "resolv system hosts: " + queryName.toString(true) + "(" + systemHostIP.get() + ")");
                             }
-                            response = createResponse(query, question, systemHostIP.get(), DnsResolv.SYSTEM_HOSTS);
-                        } else {
-                            // 転送（プロキシ）処理
-                            if (this.messageHandler != null) {
-                                this.messageHandler.message("[DNS-Thread] system:" + queryName.toString(true));
-                            }
-                            response = forwardQuery(query);
+                            response = this.createResponse(query, question, systemHostIP.get(), DnsResolv.SYSTEM_HOSTS);
                         }
+                    }
+                    if (response == null) {
+                        // 転送（プロキシ）処理
+                        if (this.messageHandler != null) {
+                            this.messageHandler.message(getLogName() + "resolv nameserver:" + queryName.toString(true));
+                        }
+                        response = this.forwardQuery(query);
                     }
                 }
 
@@ -129,11 +142,13 @@ public class DnsHandler implements Runnable {
     // 偽装レスポンスの組み立て
     private Message createResponse(Message query, Record question, InetAddress addr, DnsResolv resolvType) {
         if (this.messageHandler != null) {
-            this.messageHandler.message("[DNS-Thread] Resolved via " + resolvType.name() + ": " + question.getName() + " -> " + addr.getHostAddress());
+            this.messageHandler.message(getLogName() + "Resolved via " + resolvType.name() + ": " + question.getName() + " -> " + addr.getHostAddress());
         }
         Message response = new Message(query.getHeader().getID());
         response.getHeader().setFlag(Flags.QR);
         response.getHeader().setFlag(Flags.AA);
+        //response.getHeader().setFlag(Flags.RD);
+        response.getHeader().setFlag(Flags.RA);
         response.addRecord(question, Section.QUESTION);
         Record answer = new ARecord(question.getName(), DClass.IN, this.option.getDnsTTL(), addr);
         response.addRecord(answer, Section.ANSWER);
@@ -144,12 +159,12 @@ public class DnsHandler implements Runnable {
     private Message forwardQuery(Message query) {
         try {
             // システムリゾルバへクエリをそのまま送信
-            return systemResolver.send(query);
+            return this.systemResolver.send(query);
         } catch (IOException ex) {
             if (this.messageHandler != null) {
                 this.messageHandler.catchException(Thread.currentThread(), ex);
             }
-            System.err.println("[DNS-Thread] Forwarding failed: " + ex.getMessage());
+            System.err.println(getLogName() + "Forwarding failed: " + ex.getMessage());
             return null;
         }
     }
