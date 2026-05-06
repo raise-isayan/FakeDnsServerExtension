@@ -41,7 +41,7 @@ public class NetUtilTest {
         System.out.println("getNetworkInterfaces");
         List<InetAddress> expResult = null;
         List<InetAddress> result = NetUtil.getNetworkInterfaces();
-        for (InetAddress r: result) {
+        for (InetAddress r : result) {
             System.out.println("ip:" + r.getHostAddress());
         }
     }

@@ -62,6 +62,7 @@ public class DnsHandler implements Runnable {
         return "[" + FakeDnsProperty.FAKEDNS_PROPERTY + "] ";
     }
 
+    @Override
     public void run() {
         InetSocketAddress bindAddress = new InetSocketAddress(this.option.getBindInterface(), option.getDnsPort());
         try (DatagramSocket socket = new DatagramSocket(null)) {

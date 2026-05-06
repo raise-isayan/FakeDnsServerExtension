@@ -74,9 +74,6 @@ public class SimpleDnsServer {
      */
     public static void main(String[] args) {
         final FakeDnsProperty fakeDnsOption = new FakeDnsProperty();
-
-        args = new String[]{"-gui"};
-
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
                 // --- 引数なしのオプション ---

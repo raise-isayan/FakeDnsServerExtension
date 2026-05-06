@@ -58,7 +58,7 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
     private void initComponents() {
 
         popupInterface = new javax.swing.JPopupMenu();
-        tglStartServer = new javax.swing.JToggleButton();
+        tglStartStopServer = new javax.swing.JToggleButton();
         lblExceptionMessage = new javax.swing.JLabel();
         lblBindIntarface = new javax.swing.JLabel();
         txtBindInterface = new javax.swing.JTextField();
@@ -67,8 +67,10 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
         txtFakeIP = new javax.swing.JTextField();
         chkResolvSystemHost = new javax.swing.JCheckBox();
         chkResolvBurpHost = new javax.swing.JCheckBox();
+        lblNameServers = new javax.swing.JLabel();
+        txtNameServers = new javax.swing.JTextField();
         lblFakeDomain = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
+        scrollFakeDomains = new javax.swing.JScrollPane();
         tblFakeDomains = new javax.swing.JTable();
         btnPasteDomain = new javax.swing.JButton();
         btnAddAllDomain = new javax.swing.JButton();
@@ -76,14 +78,12 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
         btnEditDomain = new javax.swing.JButton();
         btnRemoveDomain = new javax.swing.JButton();
         btnRemoveAllDomain = new javax.swing.JButton();
-        lblFakeServers = new javax.swing.JLabel();
-        txtFakeServers = new javax.swing.JTextField();
 
         setPreferredSize(new java.awt.Dimension(800, 600));
 
-        tglStartServer.setText("Start");
-        tglStartServer.addChangeListener(this::tglStartServerStateChanged);
-        tglStartServer.addActionListener(this::tglStartServerActionPerformed);
+        tglStartStopServer.setText("Start");
+        tglStartStopServer.addChangeListener(this::tglStartStopServerStateChanged);
+        tglStartStopServer.addActionListener(this::tglStartStopServerActionPerformed);
 
         lblBindIntarface.setText("Bind Interface:");
 
@@ -97,6 +97,10 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
 
         chkResolvBurpHost.setText("resolv burp hosts");
         chkResolvBurpHost.addChangeListener(this::chkResolvBurpHostStateChanged);
+
+        lblNameServers.setText("Name Servers:");
+
+        txtNameServers.addActionListener(this::txtNameServersActionPerformed);
 
         lblFakeDomain.setText("Fake Domains:");
 
@@ -125,7 +129,7 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
         });
         tblFakeDomains.setColumnSelectionAllowed(true);
         tblFakeDomains.getTableHeader().setReorderingAllowed(false);
-        jScrollPane1.setViewportView(tblFakeDomains);
+        scrollFakeDomains.setViewportView(tblFakeDomains);
         tblFakeDomains.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 
         btnPasteDomain.setText("Paste domain");
@@ -146,10 +150,6 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
         btnRemoveAllDomain.setText("Remove All");
         btnRemoveAllDomain.addActionListener(this::btnRemoveAllDomainActionPerformed);
 
-        lblFakeServers.setText("Name Servers:");
-
-        txtFakeServers.addActionListener(this::txtFakeServersActionPerformed);
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -157,10 +157,10 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(tglStartServer, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(tglStartStopServer, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblBindIntarface, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblFakeIP, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblFakeServers, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblNameServers, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblFakeDomain, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnPasteDomain, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnAddAllDomain, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -173,7 +173,7 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addComponent(txtFakeServers, javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(txtNameServers, javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(txtFakeIP, javax.swing.GroupLayout.Alignment.LEADING)
                                 .addGroup(layout.createSequentialGroup()
                                     .addComponent(chkResolvBurpHost, javax.swing.GroupLayout.DEFAULT_SIZE, 204, Short.MAX_VALUE)
@@ -187,7 +187,7 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
                                 .addComponent(btnInterfaces)))
                         .addGap(60, 222, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(jScrollPane1)
+                        .addComponent(scrollFakeDomains)
                         .addContainerGap())))
         );
         layout.setVerticalGroup(
@@ -195,7 +195,7 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(tglStartServer)
+                    .addComponent(tglStartStopServer)
                     .addComponent(lblExceptionMessage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -208,8 +208,8 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
                     .addComponent(txtFakeIP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(9, 9, 9)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblFakeServers)
-                    .addComponent(txtFakeServers, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lblNameServers)
+                    .addComponent(txtNameServers, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(9, 9, 9)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblFakeDomain)
@@ -229,11 +229,11 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
                         .addComponent(btnRemoveDomain)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnRemoveAllDomain, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(scrollFakeDomains, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(11, Short.MAX_VALUE))
         );
 
-        tglStartServer.getAccessibleContext().setAccessibleDescription("");
+        tglStartStopServer.getAccessibleContext().setAccessibleDescription("");
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnAddAllDomainActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddAllDomainActionPerformed
@@ -245,11 +245,11 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
         this.firePropertyChange(FakeDnsProperty.FAKEDNS_PROPERTY, null, this.getProperty());
     }//GEN-LAST:event_btnRemoveDomainActionPerformed
 
-    private void tglStartServerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_tglStartServerStateChanged
+    private void tglStartStopServerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_tglStartStopServerStateChanged
         if (evt.getSource() instanceof JToggleButton button) {
             button.setText(button.isSelected() ? "Stop" : "Start");
         }
-    }//GEN-LAST:event_tglStartServerStateChanged
+    }//GEN-LAST:event_tglStartStopServerStateChanged
 
     public MontoyaApi api() {
         return BurpExtension.api();
@@ -266,7 +266,7 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
         }
     }
 
-    private void tglStartServerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tglStartServerActionPerformed
+    private void tglStartStopServerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tglStartStopServerActionPerformed
         this.setErrorMessage("");
         final FakeDnsProperty option = this.getProperty();
         final SimpleDnsServer server = this.getDnsServer();
@@ -292,22 +292,22 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
                 if (api() != null) {
                     api().logging().logToError(ex.getMessage(), ex);
                 }
-                tglStartServer.setSelected(false);
+                tglStartStopServer.setSelected(false);
             }
 
         });
 
-        if (this.tglStartServer.isSelected()) {
+        if (this.tglStartStopServer.isSelected()) {
             if (valid()) {
                 server.setFakeDnsOption(this.getProperty());
                 server.startServer();
             } else {
-                this.tglStartServer.setSelected(false);
+                this.tglStartStopServer.setSelected(false);
             }
         } else {
             server.stopServer();
         }
-    }//GEN-LAST:event_tglStartServerActionPerformed
+    }//GEN-LAST:event_tglStartStopServerActionPerformed
 
     private void btnPasteDomainActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPasteDomainActionPerformed
         String paste = SwingUtil.systemClipboardPaste();
@@ -352,9 +352,9 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
 
     }//GEN-LAST:event_btnInterfacesActionPerformed
 
-    private void txtFakeServersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtFakeServersActionPerformed
+    private void txtNameServersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNameServersActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txtFakeServersActionPerformed
+    }//GEN-LAST:event_txtNameServersActionPerformed
 
     private CustomTableModel modelFakeDomains = null;
 
@@ -435,18 +435,18 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
     private javax.swing.JButton btnRemoveDomain;
     private javax.swing.JCheckBox chkResolvBurpHost;
     private javax.swing.JCheckBox chkResolvSystemHost;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblBindIntarface;
     private javax.swing.JLabel lblExceptionMessage;
     private javax.swing.JLabel lblFakeDomain;
     private javax.swing.JLabel lblFakeIP;
-    private javax.swing.JLabel lblFakeServers;
+    private javax.swing.JLabel lblNameServers;
     private javax.swing.JPopupMenu popupInterface;
+    private javax.swing.JScrollPane scrollFakeDomains;
     private javax.swing.JTable tblFakeDomains;
-    private javax.swing.JToggleButton tglStartServer;
+    private javax.swing.JToggleButton tglStartStopServer;
     private javax.swing.JTextField txtBindInterface;
     private javax.swing.JTextField txtFakeIP;
-    private javax.swing.JTextField txtFakeServers;
+    private javax.swing.JTextField txtNameServers;
     // End of variables declaration//GEN-END:variables
 
     public void setProperty(FakeDnsProperty property) {
@@ -558,11 +558,11 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
     }
 
     private void setNameServers(List<HostNameItem> nameServers) {
-        this.txtFakeServers.setText(StringUtil.join(",", nameServers));
+        this.txtNameServers.setText(StringUtil.join(",", nameServers));
     }
 
     private List<HostNameItem> getNameServers() {
-        final List<HostNameItem> list = HostNameItem.parseHostList(this.txtFakeServers.getText());
+        final List<HostNameItem> list = HostNameItem.parseHostList(this.txtNameServers.getText());
         return list;
     }
 

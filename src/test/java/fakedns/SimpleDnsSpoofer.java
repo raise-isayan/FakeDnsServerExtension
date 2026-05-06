@@ -81,5 +81,4 @@ public class SimpleDnsSpoofer {
 //        pref.setShort("sshort", (short)255);
 //        pref.setInteger("int", 6555);
 //        pref.setLong("llong", 123456789);
-
 }
