@@ -1,7 +1,7 @@
 Burp suite Extension FakeDnsServerExtension
 =============
 
-Language/[English](Readme.md)
+Language/[Japanese](Readme-ja.md)
 
 This tool is an extension of PortSwigger product, Burp Suite.
 Supports Burp suite Professional/Community.
@@ -35,39 +35,66 @@ FakeDnsServerExtension tab will be added to Burp Suite.
 
 ![FakeDnsServerExtension Tab Scan](/image/FakeDnsServer.png)
 
-Bind Intarface::
-  Specify the bind interface.
+<dl>
+  <dt>[Start] Button:</dt>
+  <dd>Press this button to start DNS spoofing. Press it again to stop.</dd>
 
-Fake IP::
-  Specify the IP address to spoof
+  <dt>Bind Intarface:</dt>
+  <dd>Specify the bind interface.</dd>
 
-Name servers::
-  Specify the name server
+  <dt>Fake IP:</dt>
+  <dd>Specify the IP(IPv4 and IPv6) address to spoof</dd>
 
-Fake Domains::
-  Specify the DNS port
+  <dt>Name servers:</dt>
+  <dd>Specify the name server/dd>
+  <dd>(ex) 8.8.8.8,8.8.8.4</dd>
 
-resolv burp hosts::
-   If you enable this setting, hostname resolution will be based on the hosts configuration in Burp Suite. By default, this setting is enabled.
+  <dt>resolv burp hosts:</dt>
+  <dd>If you enable this setting, hostname resolution will be based on the hosts configuration in Burp Suite. By default, this setting is enabled.</dd>
 
-resolv system hosts::
-   If you enable this setting, hostname resolution will be based on the OS hosts file. By default, this setting is enabled.
+  <dt>resolv system hosts:</dt>
+  <dd>If you enable this setting, hostname resolution will be based on the OS hosts file. By default, this setting is enabled.</dd>
+
+  <dt>Fake domains:</dt>
+  <dd>Specify the domain to spoof.</dd>
+
+  <dt>[Paste domains] Button:</dt>
+  <dd>Add domains from the clipboard, separated by commas or line breaks.</dd>
+
+  <dt>[Add All] Button:</dt>
+  <dd>Add multiple domain names.</dd>
+
+  <dt>[Add] Button:</dt>
+  <dd>Add a domain.</dd>
+
+  <dt>[Edit] Button:</dt>
+  <dd>Edit the selected domain.</dd>
+
+  <dt>[Remove] Button:</dt>
+  <dd>Remove the selected domain.</dd>
+
+  <dt>[Remove] Button:</dt>
+  <dd>Remove all domains.</dd>
+
+</dl>
+
 
 ## CLI Option
 
 There is a CLI mode that can be launched from the command line.
 
 ````
-java -jar FakeDnsServerExtension-v0.2.jar -h
+java -jar FakeDnsServerExtension.jar -h
 
-Usage: java -jar FakeDnsServerExtension.jar [option] [-i, --interface <interface>] [--fakeip <fakeip>] [--fakedomains <FakeDomains>] [--nameservers <NameServers>] [-p, --port <dnPport>]
+Usage: java -jar FakeDnsServerExtension.jar [option] [-i, --interface <interface>] [--fakeip <fakeip>] [--fakeipv6 <fakeip>] [--fakedomains <FakeDomains>] [--nameservers <NameServers>] [-p, --port <dnPport>]
 [option]
         -h - help show
         -h - version show
         -gui - GUI Mode
 [command]
         -i, --interface <interface> - Specify the interface IP address.
-        --fakeip <fakeip> - Specify the IP address to spoof
+        --fakeip <fakeip> - Specify the IPv4 address to spoof
+        --fakeipv6 <fakeip> - Specify the IPv6 address to spoof
         --fakedomains <FakeDomains> - Specify the domain to spoof
         --nameservers <NameServers>  - Specify the name server
         --p, -port <dnsPort> - Specify the DNS port
@@ -119,8 +146,9 @@ Building requires a [BurpExtensionCommons](https://github.com/raise-isayan/BurpE
   * MPL 1.1
   * https://code.google.com/archive/p/juniversalchardet/
 
-* dnsjava
-  * https://mvnrepository.com/artifact/dnsjava/dnsjava
+* dnsjava(https://github.com/dnsjava/dnsjava)
+  * BSD-3-Clause license
+  * https://github.com/dnsjava/dnsjava/blob/master/LICENSE
 
 Operation is confirmed with the following versions.
 * Burp suite v2026.3.3

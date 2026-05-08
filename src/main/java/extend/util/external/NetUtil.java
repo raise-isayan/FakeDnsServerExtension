@@ -20,6 +20,7 @@ public class NetUtil {
 
     public static final String ALL_IP = "0.0.0.0";
     public static final String LOCAL_IPv4 = "127.0.0.1";
+    public static final String LOCAL_IPv6 = "0:0:0:0:0:0:0:1";
 
     public static List<InetAddress> getNetworkInterfaces() {
         List<InetAddress> inet = new ArrayList<>();
@@ -35,8 +36,13 @@ public class NetUtil {
                 while (addresses.hasMoreElements()) {
                     InetAddress addr = addresses.nextElement();
                     // IPv4のみ表示
-                    if (addr instanceof java.net.Inet4Address) {
-                        inet.add(addr);
+                    if (addr instanceof java.net.Inet4Address inet4) {
+                        inet.add(inet4);
+                    }
+                    else if (addr instanceof java.net.Inet6Address inet6) {
+                        if (!inet6.isMulticastAddress() && !inet6.isLinkLocalAddress() && !inet6.isSiteLocalAddress()) {
+                            inet.add(inet6);
+                        }
                     }
                 }
             }

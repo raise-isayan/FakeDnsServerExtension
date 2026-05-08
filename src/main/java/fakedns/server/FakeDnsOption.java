@@ -19,6 +19,8 @@ public interface FakeDnsOption {
 
     public String getFakeIP();
 
+    public String getFakeIPv6();
+
     public List<HostNameItem> getFakeDomains();
 
     public List<HostNameItem> getNameServers();
@@ -28,6 +30,7 @@ public interface FakeDnsOption {
     public boolean isResolvSystemHosts();
 
     public boolean isResolvBurpHosts();
+
 
 
 }

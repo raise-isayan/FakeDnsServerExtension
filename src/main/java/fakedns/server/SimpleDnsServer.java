@@ -38,26 +38,6 @@ public class SimpleDnsServer {
 
     private final static Logger logger = Logger.getLogger(SimpleDnsServer.class.getName());
 
-    private final static java.util.ResourceBundle BUNDLE = java.util.ResourceBundle.getBundle("burp/resources/release");
-
-    private static void usage() {
-        System.out.println("");
-        System.out.println(String.format("Usage: java -jar %s.jar [option] [-i, --interface <interface>] [--fakeip <fakeip>] [--fakedomains <FakeDomains>] [--nameservers <NameServers>] [-p, --port <dnPport>]", RELEASE.getString("projname")));
-        System.out.println("[option]");
-        System.out.println("\t-h - help show");
-        System.out.println("\t-h - version show");
-        System.out.println("\t-gui - GUI Mode ");
-        System.out.println("[command]");
-        System.out.println("\t-i, --interface <interface> - Specify the interface IP address.");
-        System.out.println("\t--fakeip <fakeip> - Specify the IP address to spoof");
-        System.out.println("\t--fakedomains <FakeDomains> - Specify the domain to spoof");
-        System.out.println("\t--nameservers <NameServers>  - Specify the name server");
-        System.out.println("\t--p, -port <dnsPort> - Specify the DNS port");
-        System.out.println("\t--disable-system-hosts - Disable DNS name resolution using the system hosts file");
-//        System.out.println("\t--disable-burp-hosts - Disable DNS name resolution using the burp hosts file");
-        System.out.println("");
-    }
-
     private final static java.util.ResourceBundle RELEASE = java.util.ResourceBundle.getBundle("burp/resources/release");
 
     public static String getProjectName() {
@@ -68,12 +48,36 @@ public class SimpleDnsServer {
         return RELEASE.getString("version");
     }
 
+//    private final static java.util.ResourceBundle BUNDLE = java.util.ResourceBundle.getBundle("fakedns/resources/release");
+
+    private static void usage() {
+        System.out.println("");
+        System.out.println(String.format("Usage: java -jar %s.jar [option] [-i, --interface <interface>] [--fakeip <fakeip>] [--fakeipv6 <fakeip>] [--fakedomains <FakeDomains>] [--nameservers <NameServers>] [-p, --port <dnPport>]", RELEASE.getString("projname")));
+        System.out.println("[option]");
+        System.out.println("\t-h - help show");
+        System.out.println("\t-h - version show");
+        System.out.println("\t-gui - GUI Mode ");
+        System.out.println("[command]");
+        System.out.println("\t-i, --interface <interface> - Specify the interface IP address.");
+        System.out.println("\t--fakeip <fakeip> - Specify the IPv4 address to spoof");
+        System.out.println("\t--fakeipv6 <fakeip> - Specify the IPv6 address to spoof");
+        System.out.println("\t--fakedomains <FakeDomains> - Specify the domain to spoof");
+        System.out.println("\t--nameservers <NameServers>  - Specify the name server");
+        System.out.println("\t--p, -port <dnsPort> - Specify the DNS port");
+        System.out.println("\t--disable-system-hosts - Disable DNS name resolution using the system hosts file");
+//        System.out.println("\t--disable-burp-hosts - Disable DNS name resolution using the burp hosts file");
+        System.out.println("");
+    }
+
+
     /*
         args = new String[]{"-gui"};
         args = new String[]{"-i","192.168.137.1", "--fakeip", "192.168.137.1", "--fakedomains", "www.example.com,www.example.jp"};
+        args = new String[]{"-i","192.168.137.1", "--fakeip", "192.168.137.1", "--fakeipv6", "::1", "--fakedomains", "www.example.com,www.example.jp"};
      */
     public static void main(String[] args) {
         final FakeDnsProperty fakeDnsOption = new FakeDnsProperty();
+
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
                 // --- 引数なしのオプション ---
@@ -113,6 +117,16 @@ public class SimpleDnsServer {
                     if (i + 1 < args.length) {
                         String fakeIP = args[++i];
                         fakeDnsOption.setFakeIP(fakeIP);
+                    } else {
+                        System.err.println(args[++i] + " requires arguments");
+                        return;
+                    }
+                    break;
+                }
+                case "--fakeipv6": {
+                    if (i + 1 < args.length) {
+                        String fakeIPv6 = args[++i];
+                        fakeDnsOption.setFakeIPv6(fakeIPv6);
                     } else {
                         System.err.println(args[++i] + " requires arguments");
                         return;
@@ -160,27 +174,37 @@ public class SimpleDnsServer {
         }
 
         // インタフェース
-        if (!IpUtil.isIPv4Address(fakeDnsOption.getBindInterface())) {
-            System.out.println("-i ipv4 format error:" + fakeDnsOption.getBindInterface());
+        if (!(IpUtil.isIPv4Address(fakeDnsOption.getBindInterface()) || IpUtil.isIPv6Address(fakeDnsOption.getBindInterface()))) {
+            System.out.println("-i IPv4 format error: " + fakeDnsOption.getBindInterface());
             usage();
             return;
         }
 
-        // 偽装IP
+        // 偽装IP(ipv4)
         if (!IpUtil.isIPv4Address(fakeDnsOption.getFakeIP())) {
-            System.out.println("--fakeip ipv4 format error:" + fakeDnsOption.getFakeIP());
+            System.out.println("--fakeip IPv4 format error: " + fakeDnsOption.getFakeIP());
             usage();
             return;
         }
 
-        System.out.println("Bind intarface:" + fakeDnsOption.getBindInterface());
-        System.out.println("FakeIP:" + fakeDnsOption.getFakeIP());
+        // 偽装IP(ipv6)
+        if (fakeDnsOption.getFakeIPv6() != null && !IpUtil.isIPv6Address(fakeDnsOption.getFakeIPv6())) {
+            System.out.println("--fakeipv6 IPv6 format error: " + fakeDnsOption.getFakeIPv6());
+            usage();
+            return;
+        }
+
+        System.out.println("Bind intarface: " + fakeDnsOption.getBindInterface());
+        System.out.println("FakeIP: " + fakeDnsOption.getFakeIP());
+        if (fakeDnsOption.getFakeIPv6() != null) {
+            System.out.println("FakeIPv6: " + fakeDnsOption.getFakeIPv6());
+        }
         System.out.println("port:" + fakeDnsOption.getDnsPort());
         if (!fakeDnsOption.getFakeDomains().isEmpty()) {
-            System.out.println("FakeDomains:" + StringUtil.join(",", HostNameItem.toStringArray(fakeDnsOption.getFakeDomains())));
+            System.out.println("FakeDomains: " + StringUtil.join(",", HostNameItem.toStringArray(fakeDnsOption.getFakeDomains())));
         }
         if (!fakeDnsOption.getNameServers().isEmpty()) {
-            System.out.println("NameServers:" + StringUtil.join(",", HostNameItem.toStringArray(fakeDnsOption.getNameServers())));
+            System.out.println("NameServers: " + StringUtil.join(",", HostNameItem.toStringArray(fakeDnsOption.getNameServers())));
         }
         // CLI の場合は常に無効
         fakeDnsOption.setResolvBurpHosts(false);
@@ -208,13 +232,16 @@ public class SimpleDnsServer {
             }
 
         });
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            dnsServer.stopServer();
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+            @Override
+            public void run() {
+                dnsServer.stopServer();
+            }
         }));
         dnsServer.startServer();
         System.out.println("Main thread: DNS Server thread started.");
         dnsServer.joinServer();
-        System.out.println("Main thread terminate.");
+        System.out.println("Main thread: terminate.");
     }
 
     private final burp.api.montoya.MontoyaApi api;
@@ -274,7 +301,7 @@ public class SimpleDnsServer {
         return (this.dnsServer != null);
     }
 
-    public void joinServer() {
+    public synchronized void joinServer() {
         if (this.dnsServer != null) {
             try {
                 this.dnsServer.join();

@@ -31,55 +31,53 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="tglStartStopServer" alignment="0" min="-2" pref="114" max="-2" attributes="0"/>
-                  <Component id="lblBindIntarface" alignment="0" min="-2" pref="114" max="-2" attributes="0"/>
-                  <Component id="lblFakeIP" alignment="0" min="-2" pref="114" max="-2" attributes="0"/>
-                  <Component id="lblNameServers" alignment="0" min="-2" pref="114" max="-2" attributes="0"/>
-                  <Component id="lblFakeDomain" alignment="0" min="-2" pref="110" max="-2" attributes="0"/>
-                  <Component id="btnPasteDomain" alignment="0" min="-2" pref="114" max="-2" attributes="0"/>
-                  <Component id="btnAddAllDomain" alignment="0" min="-2" pref="114" max="-2" attributes="0"/>
-                  <Component id="btnAddDomain" alignment="0" min="-2" pref="114" max="-2" attributes="0"/>
-                  <Component id="btnEditDomain" alignment="0" min="-2" pref="114" max="-2" attributes="0"/>
-                  <Component id="btnRemoveDomain" alignment="0" min="-2" pref="114" max="-2" attributes="0"/>
-                  <Component id="btnRemoveAllDomain" alignment="0" min="-2" pref="114" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                  <Component id="lblNameServers" max="32767" attributes="0"/>
+                  <Component id="lblFakeIP" alignment="0" max="32767" attributes="0"/>
+                  <Component id="btnAddAllDomain" alignment="0" max="32767" attributes="0"/>
+                  <Component id="btnAddDomain" alignment="0" max="32767" attributes="0"/>
+                  <Component id="btnEditDomain" alignment="0" max="32767" attributes="0"/>
+                  <Component id="btnRemoveDomain" alignment="0" max="32767" attributes="0"/>
+                  <Component id="btnRemoveAllDomain" alignment="0" pref="150" max="32767" attributes="0"/>
+                  <Component id="tglStartStopServer" alignment="0" max="32767" attributes="0"/>
+                  <Component id="lblBindIntarface" alignment="0" max="32767" attributes="0"/>
+                  <Component id="btnPasteDomain" alignment="0" max="32767" attributes="0"/>
+                  <Component id="lblFakeDomain" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="scrollFakeDomains" max="32767" attributes="0"/>
                   <Group type="102" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
-                              <Component id="txtNameServers" alignment="0" max="32767" attributes="0"/>
-                              <Component id="txtFakeIP" alignment="0" max="32767" attributes="0"/>
-                              <Group type="102" attributes="0">
-                                  <Component id="chkResolvBurpHost" pref="204" max="32767" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="chkResolvSystemHost" pref="214" max="32767" attributes="0"/>
-                              </Group>
-                          </Group>
                           <Group type="102" alignment="0" attributes="0">
-                              <Group type="103" groupAlignment="1" attributes="0">
-                                  <Component id="lblExceptionMessage" alignment="1" min="-2" pref="424" max="-2" attributes="0"/>
-                                  <Component id="txtBindInterface" min="-2" pref="424" max="-2" attributes="0"/>
-                              </Group>
+                              <Component id="txtBindInterface" min="-2" pref="488" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnInterfaces" min="-2" max="-2" attributes="0"/>
                           </Group>
+                          <Component id="lblExceptionMessage" alignment="0" min="-2" pref="424" max="-2" attributes="0"/>
+                          <Group type="102" attributes="0">
+                              <Component id="chkResolvBurpHost" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace min="-2" pref="89" max="-2" attributes="0"/>
+                              <Component id="chkResolvSystemHost" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <Component id="txtNameServers" min="-2" pref="486" max="-2" attributes="0"/>
+                          <Group type="102" attributes="0">
+                              <Component id="txtFakeIP" min="-2" pref="160" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="txtFakeIPv6" min="-2" pref="320" max="-2" attributes="0"/>
+                          </Group>
                       </Group>
-                      <EmptySpace min="60" pref="222" max="32767" attributes="0"/>
-                  </Group>
-                  <Group type="102" alignment="1" attributes="0">
-                      <Component id="scrollFakeDomains" max="32767" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
+                      <EmptySpace min="0" pref="222" max="32767" attributes="0"/>
                   </Group>
               </Group>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" max="-2" attributes="0">
                   <Component id="tglStartStopServer" max="-2" attributes="0"/>
                   <Component id="lblExceptionMessage" max="32767" attributes="0"/>
@@ -94,19 +92,20 @@
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="lblFakeIP" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="txtFakeIP" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="txtFakeIPv6" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace min="-2" pref="9" max="-2" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="lblNameServers" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="txtNameServers" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace min="-2" pref="9" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="lblFakeDomain" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="chkResolvSystemHost" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="chkResolvBurpHost" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
                       <Component id="btnPasteDomain" min="-2" max="-2" attributes="0"/>
@@ -120,10 +119,11 @@
                       <Component id="btnRemoveDomain" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="btnRemoveAllDomain" min="-2" pref="22" max="-2" attributes="0"/>
+                      <EmptySpace min="0" pref="264" max="32767" attributes="0"/>
                   </Group>
-                  <Component id="scrollFakeDomains" min="-2" max="-2" attributes="0"/>
+                  <Component id="scrollFakeDomains" pref="0" max="32767" attributes="0"/>
               </Group>
-              <EmptySpace pref="11" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -132,6 +132,15 @@
     <Component class="javax.swing.JToggleButton" name="tglStartStopServer">
       <Properties>
         <Property name="text" type="java.lang.String" value="Start"/>
+        <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[150, 22]"/>
+        </Property>
+        <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[10, 22]"/>
+        </Property>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[100, 22]"/>
+        </Property>
       </Properties>
       <AccessibilityProperties>
         <Property name="AccessibleContext.accessibleDescription" type="java.lang.String" value=""/>
@@ -146,9 +155,21 @@
     <Component class="javax.swing.JLabel" name="lblBindIntarface">
       <Properties>
         <Property name="text" type="java.lang.String" value="Bind Interface:"/>
+        <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[150, 16]"/>
+        </Property>
+        <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[10, 16]"/>
+        </Property>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[100, 16]"/>
+        </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="txtBindInterface">
+      <Events>
+        <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtBindInterfaceFocusLost"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="btnInterfaces">
       <Properties>
@@ -161,16 +182,28 @@
     <Component class="javax.swing.JLabel" name="lblFakeIP">
       <Properties>
         <Property name="text" type="java.lang.String" value="Fake IP:"/>
+        <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[150, 16]"/>
+        </Property>
+        <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[10, 16]"/>
+        </Property>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[100, 16]"/>
+        </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="txtFakeIP">
+      <Events>
+        <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtFakeIPFocusLost"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JCheckBox" name="chkResolvSystemHost">
       <Properties>
         <Property name="text" type="java.lang.String" value="resolv system hosts"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkResolvSystemHostActionPerformed"/>
+        <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="chkResolvSystemHostStateChanged"/>
       </Events>
     </Component>
     <Component class="javax.swing.JCheckBox" name="chkResolvBurpHost">
@@ -184,16 +217,34 @@
     <Component class="javax.swing.JLabel" name="lblNameServers">
       <Properties>
         <Property name="text" type="java.lang.String" value="Name Servers:"/>
+        <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[150, 16]"/>
+        </Property>
+        <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[10, 16]"/>
+        </Property>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[100, 16]"/>
+        </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="txtNameServers">
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtNameServersActionPerformed"/>
+        <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtNameServersFocusLost"/>
       </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="lblFakeDomain">
       <Properties>
         <Property name="text" type="java.lang.String" value="Fake Domains:"/>
+        <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[150, 16]"/>
+        </Property>
+        <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[10, 16]"/>
+        </Property>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[100, 16]"/>
+        </Property>
       </Properties>
     </Component>
     <Container class="javax.swing.JScrollPane" name="scrollFakeDomains">
@@ -242,6 +293,15 @@
     <Component class="javax.swing.JButton" name="btnPasteDomain">
       <Properties>
         <Property name="text" type="java.lang.String" value="Paste domain"/>
+        <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[150, 22]"/>
+        </Property>
+        <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[10, 22]"/>
+        </Property>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[100, 22]"/>
+        </Property>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnPasteDomainActionPerformed"/>
@@ -250,6 +310,15 @@
     <Component class="javax.swing.JButton" name="btnAddAllDomain">
       <Properties>
         <Property name="text" type="java.lang.String" value="Add All"/>
+        <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[150, 22]"/>
+        </Property>
+        <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[10, 22]"/>
+        </Property>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[100, 22]"/>
+        </Property>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnAddAllDomainActionPerformed"/>
@@ -258,6 +327,15 @@
     <Component class="javax.swing.JButton" name="btnAddDomain">
       <Properties>
         <Property name="text" type="java.lang.String" value="Add"/>
+        <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[150, 22]"/>
+        </Property>
+        <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[10, 22]"/>
+        </Property>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[100, 22]"/>
+        </Property>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnAddDomainActionPerformed"/>
@@ -266,6 +344,15 @@
     <Component class="javax.swing.JButton" name="btnEditDomain">
       <Properties>
         <Property name="text" type="java.lang.String" value="Edit"/>
+        <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[150, 22]"/>
+        </Property>
+        <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[10, 22]"/>
+        </Property>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[100, 22]"/>
+        </Property>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnEditDomainActionPerformed"/>
@@ -274,6 +361,15 @@
     <Component class="javax.swing.JButton" name="btnRemoveDomain">
       <Properties>
         <Property name="text" type="java.lang.String" value="Remove"/>
+        <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[150, 22]"/>
+        </Property>
+        <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[10, 22]"/>
+        </Property>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[100, 22]"/>
+        </Property>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnRemoveDomainActionPerformed"/>
@@ -282,9 +378,23 @@
     <Component class="javax.swing.JButton" name="btnRemoveAllDomain">
       <Properties>
         <Property name="text" type="java.lang.String" value="Remove All"/>
+        <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[150, 22]"/>
+        </Property>
+        <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[10, 22]"/>
+        </Property>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[100, 22]"/>
+        </Property>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnRemoveAllDomainActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JTextField" name="txtFakeIPv6">
+      <Events>
+        <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtFakeIPv6FocusLost"/>
       </Events>
     </Component>
   </SubComponents>

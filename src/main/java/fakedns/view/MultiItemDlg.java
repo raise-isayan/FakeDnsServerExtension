@@ -94,6 +94,10 @@ public class MultiItemDlg extends CustomDialog {
         getContentPane().add(pnlMain, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
+    private void customizeComponents() {
+
+    }
+
     public void setMultiLine(String[] lines) {
         this.txtMultiLine.setText(StringUtil.join("\n", lines));
     }
@@ -123,7 +127,5 @@ public class MultiItemDlg extends CustomDialog {
     private javax.swing.JTextArea txtMultiLine;
     // End of variables declaration//GEN-END:variables
 
-    private void customizeComponents() {
-    }
 
 }

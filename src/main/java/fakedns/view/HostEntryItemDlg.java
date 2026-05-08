@@ -132,6 +132,7 @@ public class HostEntryItemDlg extends CustomDialog {
     // End of variables declaration//GEN-END:variables
 
     private void customizeComponents() {
+
     }
 
     private final HostNameItem fakeDnsItem = new HostNameItem();

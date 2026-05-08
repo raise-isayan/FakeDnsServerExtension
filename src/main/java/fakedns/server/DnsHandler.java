@@ -1,23 +1,27 @@
 package fakedns.server;
 
 import extension.burp.HostName;
+import extension.helpers.IpUtil;
 import fakedns.model.FakeDnsProperty;
 import fakedns.model.HostNameItem;
-import java.io.File;
 import org.xbill.DNS.*;
 import org.xbill.DNS.Record;
-
+import org.xbill.DNS.hosts.HostsFileParser;
+import java.io.File;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.Inet4Address;
+import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.xbill.DNS.hosts.HostsFileParser;
-
 /**
  *
  * @author isayan
@@ -27,6 +31,8 @@ public class DnsHandler implements Runnable {
     private final static Logger logger = Logger.getLogger(DnsHandler.class.getName());
 
     private final static java.util.ResourceBundle RELEASE = java.util.ResourceBundle.getBundle("burp/resources/release");
+
+//    private final static java.util.ResourceBundle BUNDLE = java.util.ResourceBundle.getBundle("fakedns/resources/release");
 
     private static final int UDP_SIZE = 512;
 
@@ -62,6 +68,11 @@ public class DnsHandler implements Runnable {
         return "[" + FakeDnsProperty.FAKEDNS_PROPERTY + "] ";
     }
 
+    protected boolean isFakeDomain(Name queryName) {
+        final List<HostNameItem> fakeDomains = this.option.getFakeDomains();
+        return fakeDomains.stream().anyMatch(predicate -> predicate.isEnable() && predicate.getHostName().equalsIgnoreCase(queryName.toString(true)));
+    }
+
     @Override
     public void run() {
         InetSocketAddress bindAddress = new InetSocketAddress(this.option.getBindInterface(), option.getDnsPort());
@@ -76,42 +87,40 @@ public class DnsHandler implements Runnable {
             while (!Thread.currentThread().isInterrupted()) {
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                 socket.receive(packet);
-
                 Message query = new Message(packet.getData());
                 Record question = query.getQuestion();
                 if (question == null) {
                     continue;
                 }
-
                 Name queryName = question.getName();
+                int queryType = question.getType();
                 Message response = null;
 
                 // --- 判定ロジック ---
-                List<HostNameItem> fakeDomains = this.option.getFakeDomains();
-                if (fakeDomains.stream().anyMatch(predicate -> predicate.isEnable() && predicate.getHostName().equalsIgnoreCase(queryName.toString(true)))) {
+                if (this.isFakeDomain(queryName)) {
                     // 偽装処理
-                    response = this.createResponse(query, question, InetAddress.getByName(this.option.getFakeIP()), DnsResolv.FAKE_DOMAIN);
+                    if (queryType == Type.A) {
+                        response = this.createResponse(query, question, InetAddress.getByName(this.option.getFakeIP()), DnsResolv.FAKE_DOMAIN);
+                    }
+                    else if (this.option.getFakeIPv6() != null && IpUtil.isIPv6Address(this.option.getFakeIPv6()) && queryType == Type.AAAA) {
+                        response = this.createResponse(query, question, InetAddress.getByName(this.option.getFakeIPv6()), DnsResolv.FAKE_DOMAIN);
+                    }
                     if (this.messageHandler != null) {
-                        this.messageHandler.message(getLogName() + "FakeIP: " + queryName.toString(true) + "(" + this.option.getFakeIP() + ")");
+                        this.messageHandler.message(getLogName() + "FakeIP: " + Type.string(queryType) + " - " + queryName.toString(true) + "(" + this.option.getFakeIP() + ")");
                     }
                 } else {
                     // Burp のHost
                     if (response == null && this.option.isResolvBurpHosts()) {
                         Optional<InetAddress> burpHostIP = this.option.getBurpAddressForHost(queryName.toString(true));
                         if (burpHostIP.isPresent()) {
-                            if (this.messageHandler != null) {
-                                this.messageHandler.message(getLogName() + "resolv burp hosts: " + queryName.toString(true) + "(" + burpHostIP.get() + ")");
-                            }
                             response = this.createResponse(query, question, burpHostIP.get(), DnsResolv.BURP_HOSTS);
                         }
                     }
                     if (response == null && this.option.isResolvSystemHosts()) {
                         // OS の hosts ファイルを確認
-                        Optional<InetAddress> systemHostIP = hostsParser.getAddressForHost(queryName, Address.IPv4);
+                        int family = (queryType == Type.AAAA) ? Address.IPv6 : Address.IPv4;
+                        Optional<InetAddress> systemHostIP = this.hostsParser.getAddressForHost(queryName, family);
                         if (systemHostIP.isPresent()) {
-                            if (this.messageHandler != null) {
-                                this.messageHandler.message(getLogName() + "resolv system hosts: " + queryName.toString(true) + "(" + systemHostIP.get() + ")");
-                            }
                             response = this.createResponse(query, question, systemHostIP.get(), DnsResolv.SYSTEM_HOSTS);
                         }
                     }
@@ -142,17 +151,74 @@ public class DnsHandler implements Runnable {
 
     // 偽装レスポンスの組み立て
     private Message createResponse(Message query, Record question, InetAddress addr, DnsResolv resolvType) {
-        if (this.messageHandler != null) {
-            this.messageHandler.message(getLogName() + "Resolved via " + resolvType.name() + ": " + question.getName() + " -> " + addr.getHostAddress());
-        }
         Message response = new Message(query.getHeader().getID());
         response.getHeader().setFlag(Flags.QR);
         response.getHeader().setFlag(Flags.AA);
-        //response.getHeader().setFlag(Flags.RD);
         response.getHeader().setFlag(Flags.RA);
+        if (query.getHeader().getFlag(Flags.RD)) {
+            response.getHeader().setFlag(Flags.RD);
+        }
         response.addRecord(question, Section.QUESTION);
-        Record answer = new ARecord(question.getName(), DClass.IN, this.option.getDnsTTL(), addr);
-        response.addRecord(answer, Section.ANSWER);
+        Name queryName = question.getName();
+        int queryType = question.getType();
+        int queryClass = question.getDClass();
+
+        if (this.messageHandler != null) {
+            this.messageHandler.message(getLogName() + "resolve[" + resolvType.name() + "]: " + Type.string(queryType) + " - " + question.getName().toString(true) + " (" + addr.getHostAddress() + ")");
+        }
+
+        Record answer = null;
+        switch (queryType) {
+            case Type.A:    // IPv4対応
+            {
+                if (addr instanceof Inet4Address ipv4Addr) {
+                    answer = new ARecord(queryName, DClass.IN, question.getTTL(), ipv4Addr);
+                }
+                break;
+            }
+            case Type.AAAA: // IPv6対応
+            {
+                if (addr instanceof Inet6Address ipv6Addr) {
+                    answer = new AAAARecord(queryName, DClass.IN, question.getTTL(), ipv6Addr);
+                }
+                break;
+            }
+            case Type.HTTPS:
+            {
+                try {
+                    List<HTTPSRecord.ParameterBase> params = new ArrayList<>();
+
+                    // ALPNの設定 (h1, h2)
+                    HTTPSRecord.ParameterAlpn alpn = new HTTPSRecord.ParameterAlpn();
+                    alpn.fromString("h1,h2");
+                    params.add(alpn);
+
+                    // ipv4hintの設定
+                    if (addr instanceof Inet4Address ipv4Addr) {
+                        HTTPSRecord.ParameterIpv4Hint ipv4hint = new HTTPSRecord.ParameterIpv4Hint(List.of(ipv4Addr));
+                        params.add(ipv4hint);
+                    }
+                    if (addr instanceof Inet6Address ipv6Addr) {
+                        HTTPSRecord.ParameterIpv6Hint ipv6hint = new HTTPSRecord.ParameterIpv6Hint(List.of(ipv6Addr));
+                        params.add(ipv6hint);
+                    }
+                    answer = new HTTPSRecord(queryName, queryClass, question.getTTL(), 0, queryName, Collections.emptyList());
+
+                } catch (TextParseException ex) {
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
+                }
+                break;
+            }
+            default:
+            {
+                // 未対応のタイプはnull
+                return null;
+            }
+        }
+
+        if (answer != null) {
+            response.addRecord(answer, Section.ANSWER);
+        }
         return response;
     }
 

@@ -35,39 +35,64 @@ Burp SuiteにFakeDnsServerExtensionタブが追加されます。
 
 ![ReDoSDetector Tab Scan](/image/FakeDnsServer.png)
 
-Bind Intarface::
-  バインドインタフェースを指定します。
+<dl>
+  <dt>[Start] ボタン:</dt>
+  <dd>押下するとDNSスプーフィングが開始されます。停止するにはもう一度押してください。</dd>
 
-Fake IP::
-  偽装IPを指定します。
+  <dt>Bind Intarface:</dt>
+  <dd>バインドインタフェースを指定します。</dd>
 
-Name servers::
-  ネームサーバを指定します。
+  <dt>Fake IP:</dt>
+  <dd>偽装IP(IPv4およびIPv6)を指定します。</dd>
 
-Fake Domains::
-  偽装ドメインを指定します。
+  <dt>Name servers:</dt>
+  <dd>ネームサーバを指定します。</dd>
+  <dd>(例) 8.8.8.8,8.8.8.4</dd>
 
-resolv burp hosts::
-   この設定を有効にすると、ホスト名の解決はBurp Suiteのhosts設定に基づいて行われます。デフォルトでは、この設定は有効になっています。
+  <dt>resolv burp hosts:</dt>
+  <dd>この設定を有効にすると、ホスト名の解決はBurp Suiteのhosts設定に基づいて行われます。デフォルトでは、この設定は有効になっています。</dd>
 
-resolv system hosts::
-    この設定を有効にすると、ホスト名の解決はOSのhosts設定に基づいて行われます。デフォルトでは、この設定は有効になっています。
+  <dt>resolv burp hosts:</dt>
+  <dd>この設定を有効にすると、ホスト名の解決はBurp Suiteのhosts設定に基づいて行われます。デフォルトでは、この設定は有効になっています。</dd>
+
+  <dt>Fake domains:</dt>
+  <dd>偽装ずるドメインを指定します。</dd>
+
+  <dt>[Paste domains] ボタン:</dt>
+  <dd>クリップボードからカンマ区切りもしくは改行区切りのドメインを追加します。</dd>
+
+  <dt>[Add All] ボタン:</dt>
+  <dd>複数行のドメインを追加します。</dd>
+
+  <dt>[Add] ボタン:</dt>
+  <dd>ドメインを追加します。</dd>
+
+  <dt>[Edit] ボタン:</dt>
+  <dd>選択したドメインを編集します。</dd>
+
+  <dt>[Remove] ボタン:</dt>
+  <dd>選択ドメインを削除します。</dd>
+
+  <dt>[Remove] ボタン:</dt>
+  <dd>全てのドメインを削除します。</dd>
+</dl>
 
 ## CLI オプション
 
 コマンドラインで起動するCLIモードが存在します。
 
 ````
-java -jar FakeDnsServerExtension-v0.2.jar -h
+java -jar FakeDnsServerExtension.jar -h
 
-Usage: java -jar FakeDnsServerExtension.jar [option] [-i, --interface <interface>] [--fakeip <fakeip>] [--fakedomains <FakeDomains>] [--nameservers <NameServers>] [-p, --port <dnPport>]
+Usage: java -jar FakeDnsServerExtension.jar [option] [-i, --interface <interface>] [--fakeip <fakeip>] [--fakeipv6 <fakeip>] [--fakedomains <FakeDomains>] [--nameservers <NameServers>] [-p, --port <dnPport>]
 [option]
         -h - help show
         -h - version show
         -gui - GUI Mode
 [command]
         -i, --interface <interface> - Specify the interface IP address.
-        --fakeip <fakeip> - Specify the IP address to spoof
+        --fakeip <fakeip> - Specify the IPv4 address to spoof
+        --fakeipv6 <fakeip> - Specify the IPv6 address to spoof
         --fakedomains <FakeDomains> - Specify the domain to spoof
         --nameservers <NameServers>  - Specify the name server
         --p, -port <dnsPort> - Specify the DNS port
@@ -119,9 +144,9 @@ gradlew release
   * MPL 1.1
   * https://code.google.com/archive/p/juniversalchardet/
 
-* dnsjava
-  * https://mvnrepository.com/artifact/dnsjava/dnsjava
-
+* dnsjava(https://github.com/dnsjava/dnsjava)
+  * BSD-3-Clause license
+  * https://github.com/dnsjava/dnsjava/blob/master/LICENSE
 
 以下のバージョンで動作確認しています。
 * Burp suite v2026.3.3

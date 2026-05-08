@@ -22,14 +22,12 @@ public class BurpExtension extends BurpExtensionImpl implements ExtensionUnloadi
 
     private final static Logger logger = Logger.getLogger(BurpExtension.class.getName());
 
-    private final static java.util.ResourceBundle BUNDLE = java.util.ResourceBundle.getBundle("burp/resources/release");
-
     private SimpleDnsServer server = null;
 
     @Override
     public void initialize(MontoyaApi api) {
         super.initialize(api);
-        api.extension().setName(BUNDLE.getString("projname"));
+        api.extension().setName(SimpleDnsServer.getProjectName());
 
         // 設定ファイル読み込み
         IPropertyConfig config = this.properyFakeDns;

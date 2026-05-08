@@ -46,6 +46,18 @@ public class FakeDnsProperty implements FakeDnsOption, IPropertyConfig {
     }
 
     @Expose
+    private String fakeIPv6 = null;
+
+    public void setFakeIPv6(String fakeIPv6) {
+        this.fakeIPv6 = fakeIPv6;
+    }
+
+    @Override
+    public String getFakeIPv6() {
+        return this.fakeIPv6;
+    }
+
+    @Expose
     private final List<HostNameItem> fakeDomains = new ArrayList<>();
 
     @Override
@@ -142,6 +154,7 @@ public class FakeDnsProperty implements FakeDnsOption, IPropertyConfig {
     public void setProperty(FakeDnsProperty property) {
         this.bindInterface = property.bindInterface;
         this.fakeIP = property.fakeIP;
+        this.fakeIPv6 = property.fakeIPv6;
         this.setFakeDomains(property.fakeDomains);;
         this.setNameServers(property.nameServers);;
         this.dnsPort = property.dnsPort;
