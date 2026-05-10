@@ -17,7 +17,7 @@ public interface FakeDnsOption {
 
     public int getDnsPort();
 
-    public String getFakeIP();
+    public String getFakeIPv4();
 
     public String getFakeIPv6();
 
@@ -30,7 +30,5 @@ public interface FakeDnsOption {
     public boolean isResolvSystemHosts();
 
     public boolean isResolvBurpHosts();
-
-
 
 }

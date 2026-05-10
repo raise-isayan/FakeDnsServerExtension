@@ -70,7 +70,7 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
         txtBindInterface = new javax.swing.JTextField();
         btnInterfaces = new javax.swing.JButton();
         lblFakeIP = new javax.swing.JLabel();
-        txtFakeIP = new javax.swing.JTextField();
+        txtFakeIPv4 = new javax.swing.JTextField();
         chkResolvSystemHost = new javax.swing.JCheckBox();
         chkResolvBurpHost = new javax.swing.JCheckBox();
         lblNameServers = new javax.swing.JLabel();
@@ -114,9 +114,9 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
         lblFakeIP.setMinimumSize(new java.awt.Dimension(10, 16));
         lblFakeIP.setPreferredSize(new java.awt.Dimension(100, 16));
 
-        txtFakeIP.addFocusListener(new java.awt.event.FocusAdapter() {
+        txtFakeIPv4.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
-                txtFakeIPFocusLost(evt);
+                txtFakeIPv4FocusLost(evt);
             }
         });
 
@@ -246,7 +246,7 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
                                 .addComponent(chkResolvSystemHost))
                             .addComponent(txtNameServers, javax.swing.GroupLayout.PREFERRED_SIZE, 486, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(txtFakeIP, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(txtFakeIPv4, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(txtFakeIPv6, javax.swing.GroupLayout.PREFERRED_SIZE, 320, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(0, 222, Short.MAX_VALUE)))
@@ -267,7 +267,7 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblFakeIP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtFakeIP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtFakeIPv4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtFakeIPv6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -308,7 +308,7 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
         this.tblFakeDomains.setModel(this.modelFakeDomains);
         this.tblFakeDomains.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
 
-        SwingUtil.addHintText(this.txtFakeIP, "127.0.0.1");
+        SwingUtil.addHintText(this.txtFakeIPv4, "127.0.0.1");
         SwingUtil.addHintText(this.txtFakeIPv6, "0:0:0:0:0:0:0:1");
         SwingUtil.addHintText(this.txtNameServers, "8.8.8.8,8.8.8.4");
 
@@ -466,9 +466,9 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
         this.firePropertyChange(FakeDnsProperty.FAKEDNS_PROPERTY, null, this.getProperty());
     }//GEN-LAST:event_txtBindInterfaceFocusLost
 
-    private void txtFakeIPFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtFakeIPFocusLost
+    private void txtFakeIPv4FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtFakeIPv4FocusLost
         this.firePropertyChange(FakeDnsProperty.FAKEDNS_PROPERTY, null, this.getProperty());
-    }//GEN-LAST:event_txtFakeIPFocusLost
+    }//GEN-LAST:event_txtFakeIPv4FocusLost
 
     private void txtFakeIPv6FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtFakeIPv6FocusLost
         this.firePropertyChange(FakeDnsProperty.FAKEDNS_PROPERTY, null, this.getProperty());
@@ -525,14 +525,14 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
     private javax.swing.JTable tblFakeDomains;
     private javax.swing.JToggleButton tglStartStopServer;
     private javax.swing.JTextField txtBindInterface;
-    private javax.swing.JTextField txtFakeIP;
+    private javax.swing.JTextField txtFakeIPv4;
     private javax.swing.JTextField txtFakeIPv6;
     private javax.swing.JTextField txtNameServers;
     // End of variables declaration//GEN-END:variables
 
     public void setProperty(FakeDnsProperty property) {
         this.txtBindInterface.setText(property.getBindInterface());
-        this.txtFakeIP.setText(property.getFakeIP());
+        this.txtFakeIPv4.setText(property.getFakeIPv4());
         this.txtFakeIPv6.setText(property.getFakeIPv6());
         setFakeDomains(property.getFakeDomains());
         setNameServers(property.getNameServers());
@@ -543,7 +543,7 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
     public FakeDnsProperty getProperty() {
         FakeDnsProperty property = new FakeDnsProperty();
         property.setBindInterface(this.txtBindInterface.getText().trim());
-        property.setFakeIP(this.txtFakeIP.getText().trim());
+        property.setFakeIPv4(this.txtFakeIPv4.getText().trim());
         property.setFakeIPv6(this.txtFakeIPv6.getText().trim());
         property.setFakeDomains(this.getFakeDomains());
         property.setNameServers(this.getNameServers());
@@ -641,7 +641,7 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
     }
 
     private void setNameServers(List<HostNameItem> nameServers) {
-        this.txtNameServers.setText(StringUtil.join(",", HostNameItem.toStringArray(nameServers)));
+        this.txtNameServers.setText(HostNameItem.joinHostList(",", nameServers));
     }
     private List<HostNameItem> getNameServers() {
         final List<HostNameItem> list = HostNameItem.parseHostList(this.txtNameServers.getText());
@@ -654,14 +654,19 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
             this.setErrorMessage("interface IPv4 or IPv6 format error:" + fakeDnsOption.getBindInterface());
             return false;
         }
-        if (!IpUtil.isIPv4Address(fakeDnsOption.getFakeIP())) {
-            this.setErrorMessage("fakeip IPv4 format error:" + fakeDnsOption.getFakeIP());
+        if (!fakeDnsOption.isEmptyFakeIPv4() && !IpUtil.isIPv4Address(fakeDnsOption.getFakeIPv4())) {
+            this.setErrorMessage("fakeip IPv4 format error:" + fakeDnsOption.getFakeIPv4());
             return false;
         }
-        if (fakeDnsOption.getFakeIPv6() != null && !fakeDnsOption.getFakeIPv6().isEmpty() && !IpUtil.isIPv6Address(fakeDnsOption.getFakeIPv6())) {
+        if (!fakeDnsOption.isEmptyFakeIPv6() && !IpUtil.isIPv6Address(fakeDnsOption.getFakeIPv6())) {
             this.setErrorMessage("fakeip IPv6 format error:" + fakeDnsOption.getFakeIPv6());
             return false;
         }
+        if (fakeDnsOption.isEmptyFakeIPv4() && fakeDnsOption.isEmptyFakeIPv6()) {
+            this.setErrorMessage("fakeip has not been specified");
+            return false;
+        }
+
         List<HostNameItem> nameserverList = fakeDnsOption.getNameServers();
         for (HostNameItem item : nameserverList) {
             if (!(IpUtil.isIPv4Address(item.getHostName()) || IpUtil.isIPv6Address(item.getHostName()))) {

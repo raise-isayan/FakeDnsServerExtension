@@ -34,19 +34,23 @@ public class FakeDnsProperty implements FakeDnsOption, IPropertyConfig {
     }
 
     @Expose
-    private String fakeIP = NetUtil.LOCAL_IPv4;
+    private String fakeIPv4 = "";
 
-    public void setFakeIP(String fakeIP) {
-        this.fakeIP = fakeIP;
+    public void setFakeIPv4(String fakeIPv4) {
+        this.fakeIPv4 = fakeIPv4;
     }
 
     @Override
-    public String getFakeIP() {
-        return this.fakeIP;
+    public String getFakeIPv4() {
+        return this.fakeIPv4;
+    }
+
+    public boolean isEmptyFakeIPv4() {
+        return this.fakeIPv4 != null && this.fakeIPv4.isEmpty();
     }
 
     @Expose
-    private String fakeIPv6 = null;
+    private String fakeIPv6 = "";
 
     public void setFakeIPv6(String fakeIPv6) {
         this.fakeIPv6 = fakeIPv6;
@@ -55,6 +59,10 @@ public class FakeDnsProperty implements FakeDnsOption, IPropertyConfig {
     @Override
     public String getFakeIPv6() {
         return this.fakeIPv6;
+    }
+
+    public boolean isEmptyFakeIPv6() {
+        return this.fakeIPv6 != null && this.fakeIPv6.isEmpty();
     }
 
     @Expose
@@ -153,7 +161,7 @@ public class FakeDnsProperty implements FakeDnsOption, IPropertyConfig {
 
     public void setProperty(FakeDnsProperty property) {
         this.bindInterface = property.bindInterface;
-        this.fakeIP = property.fakeIP;
+        this.fakeIPv4 = property.fakeIPv4;
         this.fakeIPv6 = property.fakeIPv6;
         this.setFakeDomains(property.fakeDomains);;
         this.setNameServers(property.nameServers);;

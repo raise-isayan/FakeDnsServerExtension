@@ -115,8 +115,8 @@ public class SimpleDnsServer {
                 }
                 case "--fakeip": {
                     if (i + 1 < args.length) {
-                        String fakeIP = args[++i];
-                        fakeDnsOption.setFakeIP(fakeIP);
+                        String fakeIPv4 = args[++i];
+                        fakeDnsOption.setFakeIPv4(fakeIPv4);
                     } else {
                         System.err.println(args[++i] + " requires arguments");
                         return;
@@ -181,30 +181,39 @@ public class SimpleDnsServer {
         }
 
         // 偽装IP(ipv4)
-        if (!IpUtil.isIPv4Address(fakeDnsOption.getFakeIP())) {
-            System.out.println("--fakeip IPv4 format error: " + fakeDnsOption.getFakeIP());
+        if (!fakeDnsOption.isEmptyFakeIPv4() && !IpUtil.isIPv4Address(fakeDnsOption.getFakeIPv4())) {
+            System.out.println("--fakeip IPv4 format error: " + fakeDnsOption.getFakeIPv4());
             usage();
             return;
         }
 
         // 偽装IP(ipv6)
-        if (fakeDnsOption.getFakeIPv6() != null && !IpUtil.isIPv6Address(fakeDnsOption.getFakeIPv6())) {
+        if (!fakeDnsOption.isEmptyFakeIPv6() && !IpUtil.isIPv6Address(fakeDnsOption.getFakeIPv6())) {
             System.out.println("--fakeipv6 IPv6 format error: " + fakeDnsOption.getFakeIPv6());
             usage();
             return;
         }
 
+        // fakeipv4 v6 は必須
+        if (fakeDnsOption.isEmptyFakeIPv4() && fakeDnsOption.isEmptyFakeIPv6() ) {
+            System.out.println("fakeip has not been specified");
+            usage();
+            return;
+        }
+
         System.out.println("Bind intarface: " + fakeDnsOption.getBindInterface());
-        System.out.println("FakeIP: " + fakeDnsOption.getFakeIP());
-        if (fakeDnsOption.getFakeIPv6() != null) {
+        if (!fakeDnsOption.isEmptyFakeIPv4()) {
+            System.out.println("FakeIPv4: " + fakeDnsOption.getFakeIPv4());
+        }
+        if (!fakeDnsOption.isEmptyFakeIPv6()) {
             System.out.println("FakeIPv6: " + fakeDnsOption.getFakeIPv6());
         }
         System.out.println("port:" + fakeDnsOption.getDnsPort());
         if (!fakeDnsOption.getFakeDomains().isEmpty()) {
-            System.out.println("FakeDomains: " + StringUtil.join(",", HostNameItem.toStringArray(fakeDnsOption.getFakeDomains())));
+            System.out.println("FakeDomains: " + HostNameItem.joinHostList(",", fakeDnsOption.getFakeDomains()));
         }
         if (!fakeDnsOption.getNameServers().isEmpty()) {
-            System.out.println("NameServers: " + StringUtil.join(",", HostNameItem.toStringArray(fakeDnsOption.getNameServers())));
+            System.out.println("NameServers: " + HostNameItem.joinHostList(",", fakeDnsOption.getNameServers()));
         }
         // CLI の場合は常に無効
         fakeDnsOption.setResolvBurpHosts(false);
@@ -232,12 +241,6 @@ public class SimpleDnsServer {
             }
 
         });
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            @Override
-            public void run() {
-                dnsServer.stopServer();
-            }
-        }));
         dnsServer.startServer();
         System.out.println("Main thread: DNS Server thread started.");
         dnsServer.joinServer();

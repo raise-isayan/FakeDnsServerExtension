@@ -17,11 +17,11 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 /**
  *
  * @author isayan
@@ -33,27 +33,26 @@ public class DnsHandler implements Runnable {
     private final static java.util.ResourceBundle RELEASE = java.util.ResourceBundle.getBundle("burp/resources/release");
 
 //    private final static java.util.ResourceBundle BUNDLE = java.util.ResourceBundle.getBundle("fakedns/resources/release");
-
     private static final int UDP_SIZE = 512;
 
     public static enum DnsResolv {
         FAKE_DOMAIN, SYSTEM_HOSTS, BURP_HOSTS
     };
 
-    private final FakeDnsOption option;
+    private final FakeDnsProperty option;
 
     // システムデフォルトのDNS設定を使用するリゾルバ
     private Resolver systemResolver;
     private final HostsFileParser hostsParser;
 
-    public DnsHandler(FakeDnsOption option) {
+    public DnsHandler(FakeDnsProperty option) {
         this.option = option;
         // ExtendedResolverを引数なしで生成すると、OSのデフォルトDNS設定を読み込む
         if (this.option.getNameServers().isEmpty()) {
             this.systemResolver = new ExtendedResolver();
         } else {
             try {
-                this.systemResolver = new ExtendedResolver(HostNameItem.toStringArray(this.option.getNameServers()));
+                this.systemResolver = new ExtendedResolver(HostNameItem.toHostArray(this.option.getNameServers()));
             } catch (UnknownHostException ex) {
                 if (this.messageHandler != null) {
                     this.messageHandler.catchException(Thread.currentThread(), ex);
@@ -79,6 +78,16 @@ public class DnsHandler implements Runnable {
         try (DatagramSocket socket = new DatagramSocket(null)) {
             socket.setReuseAddress(true);
             socket.bind(bindAddress);
+//            socket.setSoTimeout(1000);
+
+            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    socket.close();
+                    Thread.currentThread().interrupt();
+                }
+            }));
+
             if (this.messageHandler != null) {
                 this.messageHandler.message(getLogName() + "Accept DNS: " + bindAddress.getHostString() + ":" + bindAddress.getPort());
             }
@@ -99,14 +108,17 @@ public class DnsHandler implements Runnable {
                 // --- 判定ロジック ---
                 if (this.isFakeDomain(queryName)) {
                     // 偽装処理
-                    if (queryType == Type.A) {
-                        response = this.createResponse(query, question, InetAddress.getByName(this.option.getFakeIP()), DnsResolv.FAKE_DOMAIN);
+                    if (queryType == Type.A && !this.option.isEmptyFakeIPv4() && IpUtil.isIPv4Address(this.option.getFakeIPv4())) {
+                        response = this.createResponse(query, question, InetAddress.getByName(this.option.getFakeIPv4()), DnsResolv.FAKE_DOMAIN);
+                        if (this.messageHandler != null) {
+                            this.messageHandler.message(getLogName() + "FakeIPv4: " + Type.string(queryType) + " - " + queryName.toString(true) + "(" + this.option.getFakeIPv4() + ")");
+                        }
                     }
-                    else if (this.option.getFakeIPv6() != null && IpUtil.isIPv6Address(this.option.getFakeIPv6()) && queryType == Type.AAAA) {
+                    if (queryType == Type.AAAA && !this.option.isEmptyFakeIPv6() && IpUtil.isIPv6Address(this.option.getFakeIPv6())) {
                         response = this.createResponse(query, question, InetAddress.getByName(this.option.getFakeIPv6()), DnsResolv.FAKE_DOMAIN);
-                    }
-                    if (this.messageHandler != null) {
-                        this.messageHandler.message(getLogName() + "FakeIP: " + Type.string(queryType) + " - " + queryName.toString(true) + "(" + this.option.getFakeIP() + ")");
+                        if (this.messageHandler != null) {
+                            this.messageHandler.message(getLogName() + "FakeIPv6: " + Type.string(queryType) + " - " + queryName.toString(true) + "(" + this.option.getFakeIPv6() + ")");
+                        }
                     }
                 } else {
                     // Burp のHost
@@ -124,20 +136,20 @@ public class DnsHandler implements Runnable {
                             response = this.createResponse(query, question, systemHostIP.get(), DnsResolv.SYSTEM_HOSTS);
                         }
                     }
-                    if (response == null) {
-                        // 転送（プロキシ）処理
-                        if (this.messageHandler != null) {
-                            this.messageHandler.message(getLogName() + "resolv nameserver:" + queryName.toString(true));
-                        }
-                        response = this.forwardQuery(query);
+                }
+                if (response == null) {
+                    // 転送（プロキシ）処理
+                    if (this.messageHandler != null) {
+                        this.messageHandler.message(getLogName() + "resolv nameserver: " + Type.string(queryType) + " - " + queryName.toString(true));
                     }
+                    response = this.forwardQuery(query);
                 }
 
                 // レスポンス送信
                 if (response != null) {
                     byte[] respData = response.toWire();
                     DatagramPacket respPacket = new DatagramPacket(
-                        respData, respData.length, packet.getAddress(), packet.getPort()
+                            respData, respData.length, packet.getAddress(), packet.getPort()
                     );
                     socket.send(respPacket);
                 }
@@ -169,7 +181,7 @@ public class DnsHandler implements Runnable {
 
         Record answer = null;
         switch (queryType) {
-            case Type.A:    // IPv4対応
+            case Type.A: // IPv4対応
             {
                 if (addr instanceof Inet4Address ipv4Addr) {
                     answer = new ARecord(queryName, DClass.IN, question.getTTL(), ipv4Addr);
@@ -183,8 +195,7 @@ public class DnsHandler implements Runnable {
                 }
                 break;
             }
-            case Type.HTTPS:
-            {
+            case Type.HTTPS: {
                 try {
                     List<HTTPSRecord.ParameterBase> params = new ArrayList<>();
 
@@ -202,16 +213,18 @@ public class DnsHandler implements Runnable {
                         HTTPSRecord.ParameterIpv6Hint ipv6hint = new HTTPSRecord.ParameterIpv6Hint(List.of(ipv6Addr));
                         params.add(ipv6hint);
                     }
-                    answer = new HTTPSRecord(queryName, queryClass, question.getTTL(), 0, queryName, Collections.emptyList());
+                    answer = new HTTPSRecord(queryName, queryClass, question.getTTL(), 0, queryName, params);
 
                 } catch (TextParseException ex) {
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
                 break;
             }
-            default:
-            {
+            default: {
                 // 未対応のタイプはnull
+                if (this.messageHandler != null) {
+                    this.messageHandler.message(getLogName() + "Unknown Type: " + Type.string(queryType));
+                }
                 return null;
             }
         }

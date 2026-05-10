@@ -33,9 +33,6 @@ public class FakeDnsItemTest {
     public void tearDown() {
     }
 
-    /**
-     * Test of parseHostList method, of class FakeDnsItem.
-     */
     @Test
     public void testParseHostList() {
         System.out.println("parseHostList");
@@ -79,6 +76,23 @@ public class FakeDnsItemTest {
             for (int i = 0; i < result.size(); i++) {
                 assertEquals(expResult.get(i), result.get(i));
             }
+        }
+    }
+
+    @Test
+    public void testJoinHostList() {
+        System.out.println("testJoinHostList");
+        {
+            List<HostNameItem> domainList = List.of(new HostNameItem(true, "www.examle.com"), new HostNameItem(true, "www.examle.jp"));
+            String expResult = "www.examle.com,www.examle.jp";
+            String result = HostNameItem.joinHostList(",", domainList);
+            assertEquals(expResult, result);
+        }
+        {
+            List<HostNameItem> domainList = List.of(new HostNameItem(true, "www.examle.com"), new HostNameItem(false, "www.examle.co.jp"), new HostNameItem(true, "www.examle.jp"));
+            String expResult = "www.examle.com,www.examle.jp";
+            String result = HostNameItem.joinHostList(",", domainList);
+            assertEquals(expResult, result);
         }
     }
 

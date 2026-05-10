@@ -91,7 +91,11 @@ public class HostNameItem {
         return fakeList;
     }
 
-    public static String[] toStringArray(List<HostNameItem> hostNames) {
+    public static String joinHostList(CharSequence delimiter, List<HostNameItem> hostNames) {
+        return String.join(delimiter, toHostArray(hostNames));
+    }
+
+    public static String[] toHostArray(List<HostNameItem> hostNames) {
         List<String> hosts = new ArrayList<>();
         for (HostNameItem host : hostNames) {
             if (host.isEnable()) {
