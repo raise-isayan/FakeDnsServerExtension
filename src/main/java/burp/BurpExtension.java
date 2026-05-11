@@ -1,4 +1,4 @@
-    package burp;
+package burp;
 
 import burp.api.montoya.MontoyaApi;
 import burp.api.montoya.extension.ExtensionUnloadingHandler;
@@ -73,7 +73,6 @@ public class BurpExtension extends BurpExtensionImpl implements ExtensionUnloadi
         for (String key : settings.keySet()) {
             pref.setString(key, settings.get(key));
         }
-
     }
 
     private final FakeDnsTab tabFakeDnsTab = new FakeDnsTab();

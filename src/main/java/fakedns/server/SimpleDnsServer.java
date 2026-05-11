@@ -44,6 +44,10 @@ public class SimpleDnsServer {
         return RELEASE.getString("projname");
     }
 
+    public static String getTabCaption() {
+        return RELEASE.getString("tabcaption");
+    }
+
     public static String getVersion() {
         return RELEASE.getString("version");
     }
@@ -52,10 +56,10 @@ public class SimpleDnsServer {
 
     private static void usage() {
         System.out.println("");
-        System.out.println(String.format("Usage: java -jar %s.jar [option] [-i, --interface <interface>] [--fakeip <fakeip>] [--fakeipv6 <fakeip>] [--fakedomains <FakeDomains>] [--nameservers <NameServers>] [-p, --port <dnPport>]", RELEASE.getString("projname")));
+        System.out.println(String.format("Usage: java -jar %s.jar [option] [-i, --interface <interface>] [--fakeip <fakeip>] [--fakeipv6 <fakeip>] [--fakedomains <FakeDomains>] [--nameservers <NameServers>] [-p, --port <dnPport>]", getProjectName()));
         System.out.println("[option]");
-        System.out.println("\t-h - help show");
-        System.out.println("\t-h - version show");
+        System.out.println("\t-h,--help - help show");
+        System.out.println("\t-v - version show");
         System.out.println("\t-gui - GUI Mode ");
         System.out.println("[command]");
         System.out.println("\t-i, --interface <interface> - Specify the interface IP address.");
@@ -69,7 +73,6 @@ public class SimpleDnsServer {
         System.out.println("");
     }
 
-
     /*
         args = new String[]{"-gui"};
         args = new String[]{"-i","192.168.137.1", "--fakeip", "192.168.137.1", "--fakedomains", "www.example.com,www.example.jp"};
@@ -81,20 +84,25 @@ public class SimpleDnsServer {
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
                 // --- 引数なしのオプション ---
-                case "-v": {
+                case "-v":
+                {
                     System.out.println("Version: " + getVersion());
                     System.out.println("Language: " + Locale.getDefault().getLanguage());
                     return;
                 }
-                case "-h": {
+                case "-h":
+                case "--help":
+                {
                     usage();
                     return;
                 }
-                case "-gui": {
+                case "-gui":
+                {
                     EventQueue.invokeLater(MainPanel::createAndShowGui);
                     return;
                 }
-                case "--disable-system-hosts": {
+                case "--disable-system-hosts":
+                {
                     fakeDnsOption.setResolvSystemHosts(false);
                     break;
                 }
@@ -113,7 +121,8 @@ public class SimpleDnsServer {
                     }
                     break;
                 }
-                case "--fakeip": {
+                case "--fakeip":
+                {
                     if (i + 1 < args.length) {
                         String fakeIPv4 = args[++i];
                         fakeDnsOption.setFakeIPv4(fakeIPv4);
@@ -123,7 +132,8 @@ public class SimpleDnsServer {
                     }
                     break;
                 }
-                case "--fakeipv6": {
+                case "--fakeipv6":
+                {
                     if (i + 1 < args.length) {
                         String fakeIPv6 = args[++i];
                         fakeDnsOption.setFakeIPv6(fakeIPv6);
@@ -133,7 +143,8 @@ public class SimpleDnsServer {
                     }
                     break;
                 }
-                case "--fakedomains": {
+                case "--fakedomains":
+                {
                     if (i + 1 < args.length) {
                         String fakeDomains = args[++i];
                         fakeDnsOption.setFakeDomains(HostNameItem.parseHostList(fakeDomains));
@@ -143,7 +154,8 @@ public class SimpleDnsServer {
                     }
                     break;
                 }
-                case "--nameservers": {
+                case "--nameservers":
+                {
                     if (i + 1 < args.length) {
                         String nameservers = args[++i];
                         fakeDnsOption.setNameServers(HostNameItem.parseHostList(nameservers));
@@ -154,7 +166,8 @@ public class SimpleDnsServer {
                     break;
                 }
                 case "-p":
-                case "--port": {
+                case "--port":
+                {
                     if (i + 1 < args.length) {
                         int dnsPort = ConvertUtil.parseIntDefault(args[++i], 53);
                         fakeDnsOption.setDnsPort(dnsPort);
@@ -164,7 +177,8 @@ public class SimpleDnsServer {
                     }
                     break;
                 }
-                default: {
+                default:
+                {
                     System.err.println("Unknown optoin: " + args[i]);
                     usage();
                     return;
@@ -230,16 +244,18 @@ public class SimpleDnsServer {
 
             @Override
             public void catchException(Thread t, Throwable ex) {
-                String message = "";
+                String exMessage = "";
+                String exException = "";
                 if (ex instanceof BindException) {
-                    message = "Bind Error: " + fakeDnsOption.getBindInterface() + " - " + ex.getMessage();
-                    System.out.println("Bind Error: " + StringUtil.getStackTrace(ex.getMessage(), ex));
+                    exMessage = "Bind Error: " + fakeDnsOption.getBindInterface() + " - " + ex.getMessage();
+                    exException = StringUtil.getStackTrace(ex);
                 } else if (ex instanceof IOException) {
-                    message = "Fatal Error: " + StringUtil.getStackTrace(ex.getMessage(), ex);
+                    exMessage = "Fatal Error: " + StringUtil.getStackTrace(ex.getMessage(), ex);
+                    exException = StringUtil.getStackTrace(ex);
                 }
-                System.out.println(message);
+                System.err.println(exMessage);
+                System.err.println(exException);
             }
-
         });
         dnsServer.startServer();
         System.out.println("Main thread: DNS Server thread started.");
@@ -291,7 +307,7 @@ public class SimpleDnsServer {
         FakeDnsProperty option = this.getFakeDnsOption();
         option.setBurpHosts(HostName.getInstance(burpHostList));
         DnsHandler dnsHandler = new DnsHandler(option);
-        dnsHandler.setExceptionHandler(this.getExceptionHandler());
+        dnsHandler.setEventHandler(this.getEventHandler());
 
         // スレッドを作成して開始
         this.dnsServer = new Thread(dnsHandler);
@@ -324,12 +340,12 @@ public class SimpleDnsServer {
 
     private DnsHandler.MessageHandler messageHandler = null;
 
-    public DnsHandler.MessageHandler getExceptionHandler() {
+    public DnsHandler.MessageHandler getEventHandler() {
         return this.messageHandler;
     }
 
-    public void setEventHandler(DnsHandler.MessageHandler exceptionHandler) {
-        this.messageHandler = exceptionHandler;
+    public void setEventHandler(DnsHandler.MessageHandler messageHandler) {
+        this.messageHandler = messageHandler;
     }
 
     private final static class MainPanel extends JPanel {

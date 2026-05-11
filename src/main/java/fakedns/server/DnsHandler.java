@@ -54,9 +54,7 @@ public class DnsHandler implements Runnable {
             try {
                 this.systemResolver = new ExtendedResolver(HostNameItem.toHostArray(this.option.getNameServers()));
             } catch (UnknownHostException ex) {
-                if (this.messageHandler != null) {
-                    this.messageHandler.catchException(Thread.currentThread(), ex);
-                }
+                this.fireEventMessage(Thread.currentThread(), ex);
             }
         }
         File hostsFile = HostName.getSystemHostFile();
@@ -79,7 +77,6 @@ public class DnsHandler implements Runnable {
             socket.setReuseAddress(true);
             socket.bind(bindAddress);
 //            socket.setSoTimeout(1000);
-
             Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -88,9 +85,7 @@ public class DnsHandler implements Runnable {
                 }
             }));
 
-            if (this.messageHandler != null) {
-                this.messageHandler.message(getLogName() + "Accept DNS: " + bindAddress.getHostString() + ":" + bindAddress.getPort());
-            }
+            this.fireEventMessage("Accept DNS: " + bindAddress.getHostString() + ":" + bindAddress.getPort());
             byte[] buffer = new byte[UDP_SIZE];
 
             while (!Thread.currentThread().isInterrupted()) {
@@ -110,15 +105,11 @@ public class DnsHandler implements Runnable {
                     // 偽装処理
                     if (queryType == Type.A && !this.option.isEmptyFakeIPv4() && IpUtil.isIPv4Address(this.option.getFakeIPv4())) {
                         response = this.createResponse(query, question, InetAddress.getByName(this.option.getFakeIPv4()), DnsResolv.FAKE_DOMAIN);
-                        if (this.messageHandler != null) {
-                            this.messageHandler.message(getLogName() + "FakeIPv4: " + Type.string(queryType) + " - " + queryName.toString(true) + "(" + this.option.getFakeIPv4() + ")");
-                        }
+                        this.fireEventMessage("FakeIPv4: " + Type.string(queryType) + " - " + queryName.toString(true) + "(" + this.option.getFakeIPv4() + ")");
                     }
                     if (queryType == Type.AAAA && !this.option.isEmptyFakeIPv6() && IpUtil.isIPv6Address(this.option.getFakeIPv6())) {
                         response = this.createResponse(query, question, InetAddress.getByName(this.option.getFakeIPv6()), DnsResolv.FAKE_DOMAIN);
-                        if (this.messageHandler != null) {
-                            this.messageHandler.message(getLogName() + "FakeIPv6: " + Type.string(queryType) + " - " + queryName.toString(true) + "(" + this.option.getFakeIPv6() + ")");
-                        }
+                        this.fireEventMessage("FakeIPv6: " + Type.string(queryType) + " - " + queryName.toString(true) + "(" + this.option.getFakeIPv6() + ")");
                     }
                 } else {
                     // Burp のHost
@@ -139,9 +130,7 @@ public class DnsHandler implements Runnable {
                 }
                 if (response == null) {
                     // 転送（プロキシ）処理
-                    if (this.messageHandler != null) {
-                        this.messageHandler.message(getLogName() + "resolv nameserver: " + Type.string(queryType) + " - " + queryName.toString(true));
-                    }
+                    this.fireEventMessage("resolv nameserver: " + Type.string(queryType) + " - " + queryName.toString(true));
                     response = this.forwardQuery(query);
                 }
 
@@ -149,15 +138,13 @@ public class DnsHandler implements Runnable {
                 if (response != null) {
                     byte[] respData = response.toWire();
                     DatagramPacket respPacket = new DatagramPacket(
-                            respData, respData.length, packet.getAddress(), packet.getPort()
+                        respData, respData.length, packet.getAddress(), packet.getPort()
                     );
                     socket.send(respPacket);
                 }
             }
         } catch (IOException ex) {
-            if (this.messageHandler != null) {
-                this.messageHandler.catchException(Thread.currentThread(), ex);
-            }
+            this.fireEventMessage(Thread.currentThread(), ex);
         }
     }
 
@@ -175,9 +162,7 @@ public class DnsHandler implements Runnable {
         int queryType = question.getType();
         int queryClass = question.getDClass();
 
-        if (this.messageHandler != null) {
-            this.messageHandler.message(getLogName() + "resolve[" + resolvType.name() + "]: " + Type.string(queryType) + " - " + question.getName().toString(true) + " (" + addr.getHostAddress() + ")");
-        }
+        this.fireEventMessage("resolve[" + resolvType.name() + "]: " + Type.string(queryType) + " - " + question.getName().toString(true) + " (" + addr.getHostAddress() + ")");
 
         Record answer = null;
         switch (queryType) {
@@ -220,11 +205,10 @@ public class DnsHandler implements Runnable {
                 }
                 break;
             }
-            default: {
+            default:
+            {
                 // 未対応のタイプはnull
-                if (this.messageHandler != null) {
-                    this.messageHandler.message(getLogName() + "Unknown Type: " + Type.string(queryType));
-                }
+                this.fireEventMessage("Unknown Type: " + Type.string(queryType));
                 return null;
             }
         }
@@ -259,12 +243,23 @@ public class DnsHandler implements Runnable {
 
     private MessageHandler messageHandler = null;
 
-    public MessageHandler getExceptionHandler() {
+    public MessageHandler getEventHandler() {
         return this.messageHandler;
     }
 
-    public void setExceptionHandler(MessageHandler exceptionHandler) {
+    public void setEventHandler(MessageHandler exceptionHandler) {
         this.messageHandler = exceptionHandler;
     }
 
+    public void fireEventMessage(String message) {
+        if (this.messageHandler != null) {
+            this.messageHandler.message(getLogName() + message);
+        }
+    }
+
+    public void fireEventMessage(Thread t, Throwable e) {
+        if (this.messageHandler != null) {
+            this.messageHandler.catchException(t, e);
+        }
+    }
 }

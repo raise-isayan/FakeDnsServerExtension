@@ -23,9 +23,9 @@ Please use the following versions
 
 ## How to Use
 
-The Burp Suite Extender can be loaded by following the steps below.
+The Burp Suite Extension can be loaded by following the steps below.
 
-1. Click [add] on the [Extender] tab
+1. Click [add] on the [Extensions] tab
 2. Click [Select file ...] and select FakeDnsServerExtension.jar
 3. Click [Next], confirm that no error is occurring, and close the dialog with [Close].
 
@@ -49,10 +49,10 @@ FakeDnsServerExtension tab will be added to Burp Suite.
   <dd>Specify the name server/dd>
   <dd>(ex) 8.8.8.8,8.8.8.4</dd>
 
-  <dt>resolv burp hosts:</dt>
+  <dt>[resolv burp hosts] Check box:</dt>
   <dd>If you enable this setting, hostname resolution will be based on the hosts configuration in Burp Suite. By default, this setting is enabled.</dd>
 
-  <dt>resolv system hosts:</dt>
+  <dt>[resolv system hosts] Check box:</dt>
   <dd>If you enable this setting, hostname resolution will be based on the OS hosts file. By default, this setting is enabled.</dd>
 
   <dt>Fake domains:</dt>
@@ -78,6 +78,16 @@ FakeDnsServerExtension tab will be added to Burp Suite.
 
 </dl>
 
+### Log
+
+<dl>
+  <dt>[Extensions] -> [Output]:</dt>
+  <dd>Outputs status messages, including DNS resolution logs.</dd>
+
+  <dt>[Extensions] -> [Error]:</dt>
+  <dd>Outputs error message, including logs of exceptions.</dd>
+
+</dl>
 
 ## CLI Option
 

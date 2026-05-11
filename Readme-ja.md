@@ -23,9 +23,9 @@ Burp Pro/Communityに対応しています。
 
 ## 利用方法
 
-Burp suite の Extender は以下の手順で読み込めます。
+Burp suite の Extension は以下の手順で読み込めます。
 
-1. [Extender]タブの[add]をクリック
+1. [Extensions]タブの[add]をクリック
 2. [Select file ...]をクリックし、FakeDnsServerExtension.jar を選択する。
 3. ｢Next｣をクリックし、エラーがでてないことを確認後、「Close」にてダイヤログを閉じる。
 
@@ -49,10 +49,10 @@ Burp SuiteにFakeDnsServerExtensionタブが追加されます。
   <dd>ネームサーバを指定します。</dd>
   <dd>(例) 8.8.8.8,8.8.8.4</dd>
 
-  <dt>resolv burp hosts:</dt>
+  <dt>[resolv burp hosts] チェックボックス:</dt>
   <dd>この設定を有効にすると、ホスト名の解決はBurp Suiteのhosts設定に基づいて行われます。デフォルトでは、この設定は有効になっています。</dd>
 
-  <dt>resolv burp hosts:</dt>
+  <dt>[resolv burp hosts] チェックボックス:</dt>
   <dd>この設定を有効にすると、ホスト名の解決はBurp Suiteのhosts設定に基づいて行われます。デフォルトでは、この設定は有効になっています。</dd>
 
   <dt>Fake domains:</dt>
@@ -75,6 +75,17 @@ Burp SuiteにFakeDnsServerExtensionタブが追加されます。
 
   <dt>[Remove] ボタン:</dt>
   <dd>全てのドメインを削除します。</dd>
+</dl>
+
+### ログ
+
+<dl>
+  <dt>[Extensions] -> [Output]:</dt>
+  <dd>DNS解決のログなどを含む正常メッセージを出力します。</dd>
+
+  <dt>[Extensions] -> [Error]:</dt>
+  <dd>Exceptionのログなどを含むエラーメッセージを出力します。</dd>
+
 </dl>
 
 ## CLI オプション
