@@ -32,7 +32,6 @@ public class DnsHandler implements Runnable {
 
     private final static java.util.ResourceBundle RELEASE = java.util.ResourceBundle.getBundle("burp/resources/release");
 
-//    private final static java.util.ResourceBundle BUNDLE = java.util.ResourceBundle.getBundle("fakedns/resources/release");
     private static final int UDP_SIZE = 512;
 
     public static enum DnsResolv {
@@ -138,7 +137,7 @@ public class DnsHandler implements Runnable {
                 if (response != null) {
                     byte[] respData = response.toWire();
                     DatagramPacket respPacket = new DatagramPacket(
-                        respData, respData.length, packet.getAddress(), packet.getPort()
+                            respData, respData.length, packet.getAddress(), packet.getPort()
                     );
                     socket.send(respPacket);
                 }
@@ -205,8 +204,7 @@ public class DnsHandler implements Runnable {
                 }
                 break;
             }
-            default:
-            {
+            default: {
                 // 未対応のタイプはnull
                 this.fireEventMessage("Unknown Type: " + Type.string(queryType));
                 return null;

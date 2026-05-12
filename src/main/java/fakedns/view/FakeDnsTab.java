@@ -169,7 +169,7 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
 
             },
             new String [] {
-                "chk", "Domain", "IPaddress"
+                "Enabled", "Domain", "IPaddress"
             }
         ) {
             Class[] types = new Class [] {
@@ -187,10 +187,8 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
                 return canEdit [columnIndex];
             }
         });
-        tblFakeDomains.setColumnSelectionAllowed(true);
         tblFakeDomains.getTableHeader().setReorderingAllowed(false);
         scrollFakeDomains.setViewportView(tblFakeDomains);
-        tblFakeDomains.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 
         btnPasteDomain.setText("Paste domain");
         btnPasteDomain.setMaximumSize(new java.awt.Dimension(150, 22));
@@ -329,9 +327,9 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
         SwingUtil.addHintText(this.txtNameServers, "8.8.8.8,8.8.8.4");
 
         // selected
-        this.tblFakeDomains.getColumnModel().getColumn(0).setMinWidth(20);
-        this.tblFakeDomains.getColumnModel().getColumn(0).setPreferredWidth(20);
-        this.tblFakeDomains.getColumnModel().getColumn(0).setMaxWidth(30);
+        this.tblFakeDomains.getColumnModel().getColumn(0).setMinWidth(30);
+        this.tblFakeDomains.getColumnModel().getColumn(0).setPreferredWidth(50);
+        this.tblFakeDomains.getColumnModel().getColumn(0).setMaxWidth(100);
 
         // Domain
         this.tblFakeDomains.getColumnModel().getColumn(1).setMinWidth(100);

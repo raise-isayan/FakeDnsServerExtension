@@ -78,7 +78,7 @@ public class BurpExtension extends BurpExtensionImpl implements ExtensionUnloadi
     private final FakeDnsTab tabFakeDnsTab = new FakeDnsTab();
     private final FakeDnsProperty properyFakeDns = new FakeDnsProperty();
 
-    final OptionProperty option = new OptionProperty();
+    private final OptionProperty option = new OptionProperty();
 
     public OptionProperty getProperty() {
         return this.option;

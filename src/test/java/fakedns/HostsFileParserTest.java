@@ -43,7 +43,8 @@ public class HostsFileParserTest {
     @AfterEach
     public void tearDown() {
     }
-   @Test
+
+    @Test
     public void testHostsFileParserIPv4() {
         System.out.println("testHostsFileParserIPv4");
         try {
@@ -130,7 +131,5 @@ public class HostsFileParserTest {
             fail(ex);
         }
     }
-
-
 
 }

@@ -1,6 +1,9 @@
 package extend.util.external;
 
 import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.AfterAll;
@@ -31,6 +34,27 @@ public class NetUtilTest {
 
     @AfterEach
     public void tearDown() {
+    }
+
+    /**
+     * Test of getNetworkInterfaces method, of class NetUtil.
+     */
+    @Test
+    public void testEnumNetworkInterfaces() {
+        try {
+            System.out.println("testEnumNetworkInterfaces");
+            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+            while (interfaces.hasMoreElements()) {
+                NetworkInterface iface = interfaces.nextElement();
+                Enumeration<InetAddress> addresses = iface.getInetAddresses();
+                while (addresses.hasMoreElements()) {
+                    InetAddress addr = addresses.nextElement();
+                    System.out.println("ip:" + addr.getHostAddress());
+                }
+            }
+        } catch (SocketException ex) {
+            ex.printStackTrace();
+        }
     }
 
     /**

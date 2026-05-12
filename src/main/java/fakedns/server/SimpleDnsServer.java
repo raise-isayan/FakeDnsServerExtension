@@ -52,14 +52,12 @@ public class SimpleDnsServer {
         return RELEASE.getString("version");
     }
 
-//    private final static java.util.ResourceBundle BUNDLE = java.util.ResourceBundle.getBundle("fakedns/resources/release");
-
     private static void usage() {
         System.out.println("");
         System.out.println(String.format("Usage: java -jar %s.jar [option] [-i, --interface <interface>] [--fakeip <fakeip>] [--fakeipv6 <fakeip>] [--fakedomains <FakeDomains>] [--nameservers <NameServers>] [-p, --port <dnPport>]", getProjectName()));
         System.out.println("[option]");
-        System.out.println("\t-h,--help - help show");
-        System.out.println("\t-v - version show");
+        System.out.println("\t-h, --help - help show");
+        System.out.println("\t-v, --version - version show");
         System.out.println("\t-gui - GUI Mode ");
         System.out.println("[command]");
         System.out.println("\t-i, --interface <interface> - Specify the interface IP address.");
@@ -69,7 +67,6 @@ public class SimpleDnsServer {
         System.out.println("\t--nameservers <NameServers>  - Specify the name server");
         System.out.println("\t--p, -port <dnsPort> - Specify the DNS port");
         System.out.println("\t--disable-system-hosts - Disable DNS name resolution using the system hosts file");
-//        System.out.println("\t--disable-burp-hosts - Disable DNS name resolution using the burp hosts file");
         System.out.println("");
     }
 
@@ -85,31 +82,24 @@ public class SimpleDnsServer {
             switch (args[i]) {
                 // --- 引数なしのオプション ---
                 case "-v":
-                {
+                case "--version": {
                     System.out.println("Version: " + getVersion());
                     System.out.println("Language: " + Locale.getDefault().getLanguage());
                     return;
                 }
                 case "-h":
-                case "--help":
-                {
+                case "--help": {
                     usage();
                     return;
                 }
-                case "-gui":
-                {
+                case "-gui": {
                     EventQueue.invokeLater(MainPanel::createAndShowGui);
                     return;
                 }
-                case "--disable-system-hosts":
-                {
+                case "--disable-system-hosts": {
                     fakeDnsOption.setResolvSystemHosts(false);
                     break;
                 }
-//                case "--disable-burp-hosts": {
-//                    fakeDnsOption.setResolvBurpHosts(false);
-//                    break;
-//                }
                 // --- 引数ありのオプション ---
                 case "-i":
                 case "--interface": {
@@ -121,8 +111,7 @@ public class SimpleDnsServer {
                     }
                     break;
                 }
-                case "--fakeip":
-                {
+                case "--fakeip": {
                     if (i + 1 < args.length) {
                         String fakeIPv4 = args[++i];
                         fakeDnsOption.setFakeIPv4(fakeIPv4);
@@ -132,8 +121,7 @@ public class SimpleDnsServer {
                     }
                     break;
                 }
-                case "--fakeipv6":
-                {
+                case "--fakeipv6": {
                     if (i + 1 < args.length) {
                         String fakeIPv6 = args[++i];
                         fakeDnsOption.setFakeIPv6(fakeIPv6);
@@ -143,8 +131,7 @@ public class SimpleDnsServer {
                     }
                     break;
                 }
-                case "--fakedomains":
-                {
+                case "--fakedomains": {
                     if (i + 1 < args.length) {
                         String fakeDomains = args[++i];
                         fakeDnsOption.setFakeDomains(HostNameItem.parseHostList(fakeDomains));
@@ -154,8 +141,7 @@ public class SimpleDnsServer {
                     }
                     break;
                 }
-                case "--nameservers":
-                {
+                case "--nameservers": {
                     if (i + 1 < args.length) {
                         String nameservers = args[++i];
                         fakeDnsOption.setNameServers(HostNameItem.parseHostList(nameservers));
@@ -166,8 +152,7 @@ public class SimpleDnsServer {
                     break;
                 }
                 case "-p":
-                case "--port":
-                {
+                case "--port": {
                     if (i + 1 < args.length) {
                         int dnsPort = ConvertUtil.parseIntDefault(args[++i], 53);
                         fakeDnsOption.setDnsPort(dnsPort);
@@ -177,8 +162,7 @@ public class SimpleDnsServer {
                     }
                     break;
                 }
-                default:
-                {
+                default: {
                     System.err.println("Unknown optoin: " + args[i]);
                     usage();
                     return;
@@ -209,7 +193,7 @@ public class SimpleDnsServer {
         }
 
         // fakeipv4 v6 は必須
-        if (fakeDnsOption.isEmptyFakeIPv4() && fakeDnsOption.isEmptyFakeIPv6() ) {
+        if (fakeDnsOption.isEmptyFakeIPv4() && fakeDnsOption.isEmptyFakeIPv6()) {
             System.out.println("fakeip has not been specified");
             usage();
             return;
@@ -266,20 +250,6 @@ public class SimpleDnsServer {
     private final burp.api.montoya.MontoyaApi api;
     private final FakeDnsProperty fakeDnsOption = new FakeDnsProperty();
 
-    /**
-     * @return the fakeDnsOption
-     */
-    public FakeDnsProperty getFakeDnsOption() {
-        return this.fakeDnsOption;
-    }
-
-    /**
-     * @param fakeDnsOption the fakeDnsOption to set
-     */
-    public void setFakeDnsOption(FakeDnsProperty fakeDnsOption) {
-        this.fakeDnsOption.setProperty(fakeDnsOption);
-    }
-
     // private DnsHandler dnsHandler = null;
     private Thread dnsServer = null;
 
@@ -311,7 +281,6 @@ public class SimpleDnsServer {
 
         // スレッドを作成して開始
         this.dnsServer = new Thread(dnsHandler);
-//        dnsThread.setDaemon(false); // メインが終了しても動き続ける（必要に応じて設定）
         this.dnsServer.start();
 
     }
@@ -336,6 +305,20 @@ public class SimpleDnsServer {
             this.dnsServer.interrupt();
         }
         this.dnsServer = null;
+    }
+
+    /**
+     * @return the fakeDnsOption
+     */
+    public FakeDnsProperty getFakeDnsOption() {
+        return this.fakeDnsOption;
+    }
+
+    /**
+     * @param fakeDnsOption the fakeDnsOption to set
+     */
+    public void setFakeDnsOption(FakeDnsProperty fakeDnsOption) {
+        this.fakeDnsOption.setProperty(fakeDnsOption);
     }
 
     private DnsHandler.MessageHandler messageHandler = null;
