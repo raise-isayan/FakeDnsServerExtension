@@ -118,7 +118,7 @@ public class FakeDnsProperty implements FakeDnsOption, IPropertyConfig {
             List<HostNameEntry> entrys = this.burpHosts.resolvHostNames(hostnname);
             try {
                 for (HostNameEntry entry : entrys) {
-                    InetAddress addr = entry.asHostAddress();
+                    InetAddress addr = entry.asHostInetAddress();
                     if (family == IPv4_FAMILY && addr instanceof Inet4Address) {
                         return Optional.of(addr);
                     }
