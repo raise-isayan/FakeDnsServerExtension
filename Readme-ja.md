@@ -29,7 +29,7 @@ Burp suite の Extension は以下の手順で読み込めます。
 2. [Select file ...]をクリックし、FakeDnsServerExtension.jar を選択する。
 3. ｢Next｣をクリックし、エラーがでてないことを確認後、「Close」にてダイヤログを閉じる。
 
-### FakeDns タブ
+### Fake Dns タブ
 
 Burp SuiteにFakeDnsServerExtensionタブが追加されます。
 
@@ -97,8 +97,8 @@ java -jar FakeDnsServerExtension.jar -h
 
 Usage: java -jar FakeDnsServerExtension.jar [option] [-i, --interface <interface>] [--fakeip <fakeip>] [--fakeipv6 <fakeip>] [--fakedomains <FakeDomains>] [--nameservers <NameServers>] [-p, --port <dnPport>]
 [option]
-        -h - help show
-        -h - version show
+        -h, --help - help show
+        -v, --version - version show
         -gui - GUI Mode
 [command]
         -i, --interface <interface> - Specify the interface IP address.

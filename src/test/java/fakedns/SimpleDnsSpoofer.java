@@ -1,5 +1,6 @@
 package fakedns;
 
+import extension.helpers.StringUtil;
 import org.xbill.DNS.*;
 import org.xbill.DNS.Record;
 
@@ -66,13 +67,11 @@ public class SimpleDnsSpoofer {
                         System.out.println("  -> Spoofed response sent!");
                     }
                 } catch (Exception e) {
-                    System.err.println("Error processing query: " + e.getMessage());
-                    e.printStackTrace();
+                    System.err.println(StringUtil.getStackTrace(e.getMessage(), e));
                 }
             }
         } catch (IOException e) {
-            System.err.println("Could not listen on port " + DNS_PORT + ". Are you running as Admin?");
-            e.printStackTrace();
+            System.err.println(StringUtil.getStackTrace(e.getMessage(), e));
         }
     }
 

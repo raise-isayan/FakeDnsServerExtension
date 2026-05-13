@@ -260,7 +260,7 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
                                 .addComponent(btnInterfaces))
                             .addGroup(pnlMainLayout.createSequentialGroup()
                                 .addComponent(chkResolvBurpHost)
-                                .addGap(89, 89, 89)
+                                .addGap(18, 18, 18)
                                 .addComponent(chkResolvSystemHost))
                             .addComponent(txtNameServers, javax.swing.GroupLayout.PREFERRED_SIZE, 486, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(pnlMainLayout.createSequentialGroup()

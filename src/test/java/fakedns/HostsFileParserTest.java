@@ -1,5 +1,7 @@
 package fakedns;
 
+import extension.burp.HostName;
+import extension.burp.HostNameEntry;
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
@@ -119,13 +121,30 @@ public class HostsFileParserTest {
                 Optional<InetAddress> host = hostsParser.getAddressForHost(Name.fromString("www.example.co.jp."), Type.AAAA);
                 assertTrue(host.isPresent());
                 assertTrue(host.get() instanceof Inet6Address);
-                System.out.println(">" + host.get().getHostAddress());
-//                assertEquals("2001:db8:3333:4444:5555:6666:7777:8888", host.get().getHostAddress());
+                assertEquals("2001:db8:0:0:0:0:0:1", host.get().getHostAddress());
                 System.out.println(host.get());
             }
         } catch (URISyntaxException ex) {
             fail(ex);
         } catch (TextParseException ex) {
+            fail(ex);
+        } catch (IOException ex) {
+            fail(ex);
+        }
+    }
+
+    @Test
+    public void testHostsFile() {
+        try {
+            System.out.println("testHostsFile");
+            URI test_host_uri = HostsFileParserTest.class.getResource("/resources/hosts_ipv4").toURI();
+            HostsFileParser hostsParser = new HostsFileParser(Path.of(test_host_uri));
+            Optional<InetAddress> host = hostsParser.getAddressForHost(Name.fromString("www.example.com."), Type.A);
+            HostName hostName = HostName.parseHosts(HostName.parseLines(Path.of(test_host_uri)));
+            HostNameEntry entry = hostName.resolvHostName("www.example.com");
+            assertTrue(host.isPresent());
+            assertTrue(entry.getIPAddress().equals(host.get().getHostAddress()));
+        } catch (URISyntaxException ex) {
             fail(ex);
         } catch (IOException ex) {
             fail(ex);

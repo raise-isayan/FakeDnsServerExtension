@@ -127,5 +127,4 @@ public class MultiItemDlg extends CustomDialog {
     private javax.swing.JTextArea txtMultiLine;
     // End of variables declaration//GEN-END:variables
 
-
 }

@@ -16,9 +16,10 @@ import java.util.logging.Logger;
  * @author isayan
  */
 public class NetUtil {
+
     private final static Logger logger = Logger.getLogger(NetUtil.class.getName());
 
-    public static final String ALL_IP = "0.0.0.0";
+    public static final String ALL_IPv4 = "0.0.0.0";
     public static final String LOCAL_IPv4 = "127.0.0.1";
     public static final String LOCAL_IPv6 = "0:0:0:0:0:0:0:1";
 
@@ -29,26 +30,19 @@ public class NetUtil {
             Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
             while (interfaces.hasMoreElements()) {
                 NetworkInterface iface = interfaces.nextElement();
-
-                // 有効かつループバックでないものを選択
-//                if (!iface.isUp() || iface.isLoopback()) continue;
                 Enumeration<InetAddress> addresses = iface.getInetAddresses();
                 while (addresses.hasMoreElements()) {
                     InetAddress addr = addresses.nextElement();
-                    // IPv4のみ表示
                     if (addr instanceof java.net.Inet4Address inet4) {
-                        inet.add(inet4);
-                    }
-                    else if (addr instanceof java.net.Inet6Address inet6) {
+                        inet.add(inet4); // IPv4
+                    } else if (addr instanceof java.net.Inet6Address inet6) {
                         if (!inet6.isMulticastAddress() && !inet6.isLinkLocalAddress() && !inet6.isSiteLocalAddress()) {
-                            inet.add(inet6);
+                            inet.add(inet6); // IPv6
                         }
                     }
                 }
             }
-        } catch (SocketException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (UnknownHostException ex) {
+        } catch (SocketException | UnknownHostException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
         return inet;

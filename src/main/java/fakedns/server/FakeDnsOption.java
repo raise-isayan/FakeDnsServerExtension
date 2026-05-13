@@ -11,7 +11,10 @@ import java.util.Optional;
  */
 public interface FakeDnsOption {
 
-    public Optional<InetAddress> getBurpAddressForHost(String hostnname);
+    public static final int IPv4_FAMILY = 4;
+    public static final int IPv6_FAMILY = 6;
+
+    public Optional<InetAddress> getBurpAddressForHost(String hostnname, int family);
 
     public String getBindInterface();
 

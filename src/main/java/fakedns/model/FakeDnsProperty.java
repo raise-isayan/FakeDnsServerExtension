@@ -7,6 +7,8 @@ import extension.burp.HostNameEntry;
 import extension.burp.IPropertyConfig;
 import extension.helpers.json.JsonUtil;
 import fakedns.server.FakeDnsOption;
+import java.net.Inet4Address;
+import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -22,7 +24,7 @@ public class FakeDnsProperty implements FakeDnsOption, IPropertyConfig {
     public final static String FAKEDNS_PROPERTY = "FakeDns";
 
     @Expose
-    private String bindInterface = NetUtil.ALL_IP;
+    private String bindInterface = NetUtil.ALL_IPv4;
 
     public void setBindInterface(String bindInterface) {
         this.bindInterface = bindInterface;
@@ -111,12 +113,18 @@ public class FakeDnsProperty implements FakeDnsOption, IPropertyConfig {
     }
 
     @Override
-    public Optional<InetAddress> getBurpAddressForHost(String hostnname) {
+    public Optional<InetAddress> getBurpAddressForHost(String hostnname, int family) {
         if (this.burpHosts != null) {
+            List<HostNameEntry> entrys = this.burpHosts.resolvHostNames(hostnname);
             try {
-                HostNameEntry entry = this.burpHosts.resolvHostName(hostnname);
-                if (entry != null) {
-                    return Optional.ofNullable(entry.asInetAddress());
+                for (HostNameEntry entry : entrys) {
+                    InetAddress addr = entry.asHostAddress();
+                    if (family == IPv4_FAMILY && addr instanceof Inet4Address) {
+                        return Optional.of(addr);
+                    }
+                    if (family == IPv6_FAMILY && addr instanceof Inet6Address) {
+                        return Optional.of(addr);
+                    }
                 }
             } catch (UnknownHostException ex) {
                 // nothing

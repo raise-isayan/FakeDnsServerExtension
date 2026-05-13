@@ -56,7 +56,7 @@ public class HostNameItem {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof HostNameItem item) {
-            return this.enable == item.enable && this.hostName.equals(this.hostName);
+            return this.enable == item.enable && this.hostName.equalsIgnoreCase(item.hostName);
         }
         return false;
     }
@@ -67,7 +67,7 @@ public class HostNameItem {
     }
 
     public static Object[] toObjects(HostNameItem item) {
-        Object[] beans = new Object[10];
+        Object[] beans = new Object[2];
         beans[0] = item.isEnable();
         beans[1] = item.getHostName();
         return beans;
@@ -96,9 +96,13 @@ public class HostNameItem {
     }
 
     public static String[] toHostArray(List<HostNameItem> hostNames) {
+        return toHostArray(hostNames, false);
+    }
+
+    public static String[] toHostArray(List<HostNameItem> hostNames, boolean entryAll) {
         List<String> hosts = new ArrayList<>();
         for (HostNameItem host : hostNames) {
-            if (host.isEnable()) {
+            if (host.isEnable() || entryAll) {
                 hosts.add(host.getHostName());
             }
         }
