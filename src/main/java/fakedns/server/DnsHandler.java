@@ -128,12 +128,6 @@ public class DnsHandler implements Runnable {
                         }
                     }
                 }
-                if (response == null) {
-                    // 転送（プロキシ）処理
-                    this.fireEventMessage("resolv nameserver: " + Type.string(queryType) + " - " + queryName.toString(true));
-                    response = this.forwardQuery(query);
-                }
-
                 // レスポンス送信
                 if (response != null) {
                     byte[] respData = response.toWire();
@@ -141,6 +135,11 @@ public class DnsHandler implements Runnable {
                             respData, respData.length, packet.getAddress(), packet.getPort()
                     );
                     socket.send(respPacket);
+                }
+                else  {
+                    // 転送（プロキシ）処理
+                    this.fireEventMessage("resolv nameserver: " + Type.string(queryType) + " - " + queryName.toString(true));
+                    response = this.forwardQuery(query);
                 }
             }
         } catch (IOException ex) {
