@@ -26,8 +26,8 @@ shadowJar {
 //   exclude 'META-INF/*.DSA'
 //   exclude 'META-INF/*.RSA'
 //   exclude 'junit/**'
-//   mergeServiceFiles()
    exclude 'META-INF/services/java.net.spi.InetAddressResolverProvider'
+   mergeServiceFiles()
    archiveClassifier.set('')
    destinationDirectory = file('release')
    archiveVersion.set("v${release_version_major}")

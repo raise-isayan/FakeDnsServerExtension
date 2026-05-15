@@ -22,7 +22,11 @@ public class SimpleDnsSpoofer {
         try {
             // InetSocketAddress を使用して特定のインターフェースにバインド
             InetSocketAddress bindAddress = new InetSocketAddress(BIND_ADDRESS, DNS_PORT);
-            DatagramSocket socket = new DatagramSocket(bindAddress);
+//            DatagramSocket socket = new DatagramSocket(bindAddress);
+            DatagramSocket socket = new DatagramSocket(null);
+            socket.setReuseAddress(true);
+            socket.bind(bindAddress);
+
             System.out.println("DNS Spoofing server started on port " + DNS_PORT);
             System.out.println("Spoofing: " + TARGET_DOMAIN + " -> " + SPOOFED_IP);
 

@@ -402,6 +402,9 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
                 if (api() != null) {
                     api().logging().logToOutput(message);
                 }
+                else {
+                    System.out.println(message);
+                }
             }
 
             @Override
@@ -416,6 +419,9 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
                 setErrorMessage(message);
                 if (api() != null) {
                     api().logging().logToError(ex.getMessage(), ex);
+                }
+                else {
+                    System.err.println(message);
                 }
                 tglStartStopServer.setSelected(false);
             }
