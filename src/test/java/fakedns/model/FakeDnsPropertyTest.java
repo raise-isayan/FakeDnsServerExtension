@@ -2,9 +2,12 @@ package fakedns.model;
 
 import extension.burp.HostName;
 import java.io.IOException;
+import java.net.Inet4Address;
+import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.UnknownHostException;
 import java.nio.file.Path;
 import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
@@ -91,6 +94,45 @@ public class FakeDnsPropertyTest {
             fail(ex);
         }
     }
+
+    @Test
+    public void testAsInetAddress() {
+        System.out.println("testAsInetAddress");
+        try {
+            FakeDnsProperty prop = new FakeDnsProperty();
+            {
+                prop.setFakeIPv4("192.0.2.11");
+                prop.setFakeIPv6("2001:db8:85a3::8a2e:370:7334");
+                Inet4Address inet4 = prop.asFakeIPv4Address();
+                assertEquals("192.0.2.11", inet4.getHostAddress());
+                Inet6Address inet6 = prop.asFakeIPv6Address();
+                assertEquals("2001:db8:85a3:0:0:8a2e:370:7334", inet6.getHostAddress());
+            }
+        } catch (UnknownHostException ex) {
+            ex.printStackTrace();
+        }
+        try {
+            FakeDnsProperty prop = new FakeDnsProperty();
+            {
+                prop.setFakeIPv4("2001:db8:85a3::8a2e:370:7334");
+                Inet4Address inet4 = prop.asFakeIPv4Address();
+                fail();
+            }
+        } catch (UnknownHostException ex) {
+            //
+        }
+        try {
+            FakeDnsProperty prop = new FakeDnsProperty();
+            {
+                prop.setFakeIPv6("192.0.2.11");
+                Inet6Address inet6 = prop.asFakeIPv6Address();
+                fail();
+            }
+        } catch (UnknownHostException ex) {
+            //
+        }
+    }
+
 
     /**
      * Test of defaultSetting method, of class FakeDnsProperty.

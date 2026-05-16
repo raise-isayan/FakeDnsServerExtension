@@ -5,12 +5,14 @@ import extend.util.external.NetUtil;
 import extension.burp.HostName;
 import extension.burp.HostNameEntry;
 import extension.burp.IPropertyConfig;
+import extension.helpers.IpUtil;
 import extension.helpers.json.JsonUtil;
 import fakedns.server.FakeDnsOption;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -51,6 +53,16 @@ public class FakeDnsProperty implements FakeDnsOption, IPropertyConfig {
         return this.fakeIPv4 != null && this.fakeIPv4.isEmpty();
     }
 
+    public Inet4Address asFakeIPv4Address() throws UnknownHostException {
+        try {
+            return (Inet4Address)InetAddress.getByAddress(IpUtil.parseIPAddressByte(this.fakeIPv4));
+        } catch (ParseException ex) {
+            throw new UnknownHostException(ex.getMessage());
+        } catch (ClassCastException ex) {
+            throw new UnknownHostException(ex.getMessage());
+        }
+    }
+
     @Expose
     private String fakeIPv6 = "";
 
@@ -65,6 +77,16 @@ public class FakeDnsProperty implements FakeDnsOption, IPropertyConfig {
 
     public boolean isEmptyFakeIPv6() {
         return this.fakeIPv6 != null && this.fakeIPv6.isEmpty();
+    }
+
+    public Inet6Address asFakeIPv6Address() throws UnknownHostException {
+        try {
+            return (Inet6Address)InetAddress.getByAddress(IpUtil.parseIPAddressByte(this.fakeIPv6));
+        } catch (ParseException ex) {
+            throw new UnknownHostException(ex.getMessage());
+        } catch (ClassCastException ex) {
+            throw new UnknownHostException(ex.getMessage());
+        }
     }
 
     @Expose

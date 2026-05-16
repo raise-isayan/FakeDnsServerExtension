@@ -15,6 +15,7 @@ import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +27,7 @@ import java.util.logging.Logger;
  *
  * @author isayan
  */
-public class DnsHandler implements Runnable {
+public class DnsHandler extends Thread {
 
     private final static Logger logger = Logger.getLogger(DnsHandler.class.getName());
 
@@ -58,6 +59,7 @@ public class DnsHandler implements Runnable {
         }
         File hostsFile = HostName.getSystemHostFile();
         this.hostsParser = new HostsFileParser(hostsFile.toPath());
+        this.socket = null;
     }
 
     private String getLogName() {
@@ -69,18 +71,20 @@ public class DnsHandler implements Runnable {
         return fakeDomains.stream().anyMatch(predicate -> predicate.isEnable() && predicate.getHostName().equalsIgnoreCase(queryName.toString(true)));
     }
 
+    private DatagramSocket socket;
+
     @Override
     public void run() {
         InetSocketAddress bindAddress = new InetSocketAddress(this.option.getBindInterface(), option.getDnsPort());
-        try (DatagramSocket socket = new DatagramSocket(null)) {
-            socket.setReuseAddress(true);
-            socket.bind(bindAddress);
+        try  {
+            this.socket = new DatagramSocket(null);
+            this.socket.setReuseAddress(true);
+            this.socket.bind(bindAddress);
 //            socket.setSoTimeout(1000);
             Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    socket.close();
-                    Thread.currentThread().interrupt();
+                    terminate();
                 }
             }));
 
@@ -104,11 +108,11 @@ public class DnsHandler implements Runnable {
                     // 偽装処理
                     if (queryType == Type.A && !this.option.isEmptyFakeIPv4() && IpUtil.isIPv4Address(this.option.getFakeIPv4())) {
                         response = this.createResponse(query, question, InetAddress.getByName(this.option.getFakeIPv4()), DnsResolv.FAKE_DOMAIN);
-                        this.fireEventMessage("FakeIPv4: " + Type.string(queryType) + " - " + queryName.toString(true) + "(" + this.option.getFakeIPv4() + ")");
+//                        this.fireEventMessage("FakeIPv4: " + Type.string(queryType) + " - " + queryName.toString(true) + " [" + this.option.getFakeIPv4() + "]");
                     }
                     if (queryType == Type.AAAA && !this.option.isEmptyFakeIPv6() && IpUtil.isIPv6Address(this.option.getFakeIPv6())) {
                         response = this.createResponse(query, question, InetAddress.getByName(this.option.getFakeIPv6()), DnsResolv.FAKE_DOMAIN);
-                        this.fireEventMessage("FakeIPv6: " + Type.string(queryType) + " - " + queryName.toString(true) + "(" + this.option.getFakeIPv6() + ")");
+//                        this.fireEventMessage("FakeIPv6: " + Type.string(queryType) + " - " + queryName.toString(true) + " [" + this.option.getFakeIPv6() + "]");
                     }
                 } else {
                     // Burp のHost
@@ -131,9 +135,7 @@ public class DnsHandler implements Runnable {
                 // レスポンス送信
                 if (response != null) {
                     byte[] respData = response.toWire();
-                    DatagramPacket respPacket = new DatagramPacket(
-                            respData, respData.length, packet.getAddress(), packet.getPort()
-                    );
+                    DatagramPacket respPacket = new DatagramPacket(respData, respData.length, packet.getAddress(), packet.getPort());
                     socket.send(respPacket);
                 }
                 else  {
@@ -142,9 +144,23 @@ public class DnsHandler implements Runnable {
                     response = this.forwardQuery(query);
                 }
             }
+        } catch (SocketException ex) {
+            this.fireEventMessage(ex.getMessage());
         } catch (IOException ex) {
             this.fireEventMessage(Thread.currentThread(), ex);
+        } finally {
+            if (!this.socket.isClosed()) {
+                this.socket.close();
+            }
         }
+
+    }
+
+    public synchronized void terminate() {
+        if (this.socket != null && !this.socket.isClosed()) {
+            this.socket.close();
+        }
+        Thread.currentThread().interrupt();
     }
 
     // 偽装レスポンスの組み立て
@@ -161,7 +177,7 @@ public class DnsHandler implements Runnable {
         int queryType = question.getType();
         int queryClass = question.getDClass();
 
-        this.fireEventMessage("resolve[" + resolvType.name() + "]: " + Type.string(queryType) + " - " + question.getName().toString(true) + " (" + addr.getHostAddress() + ")");
+        this.fireEventMessage("resolv <" + resolvType.name() + ">: " + Type.string(queryType) + " - " + question.getName().toString(true) + " [" + addr.getHostAddress() + "]");
 
         Record answer = null;
         switch (queryType) {

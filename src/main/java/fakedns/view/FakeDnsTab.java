@@ -364,14 +364,18 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
         return BurpExtension.api();
     }
 
-    public SimpleDnsServer getDnsServer() {
+    private SimpleDnsServer server = null;
+
+    public synchronized SimpleDnsServer getDnsServerInstance() {
         BurpExtension instance = BurpExtension.getInstance();
         if (instance != null) {
             return instance.getServer();
         } else {
-            SimpleDnsServer server = new SimpleDnsServer(null);
-            server.setFakeDnsOption(this.getProperty());
-            return server;
+            if (this.server == null) {
+                this.server = new SimpleDnsServer(null);
+            }
+            this.server.setFakeDnsOption(this.getProperty());
+            return this.server;
         }
     }
 
@@ -394,7 +398,7 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
     private void tglStartStopServerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tglStartStopServerActionPerformed
         this.setErrorMessage("");
         final FakeDnsProperty option = this.getProperty();
-        final SimpleDnsServer server = this.getDnsServer();
+        final SimpleDnsServer server = this.getDnsServerInstance();
         server.setEventHandler(new DnsHandler.MessageHandler() {
 
             @Override

@@ -76,6 +76,7 @@ public class SimpleDnsServer {
         args = new String[]{"-i","192.168.137.1", "--fakeip", "192.168.137.1", "--fakeipv6", "::1", "--fakedomains", "www.example.com,www.example.jp"};
      */
     public static void main(String[] args) {
+
         final FakeDnsProperty fakeDnsOption = new FakeDnsProperty();
 
         for (int i = 0; i < args.length; i++) {
@@ -250,8 +251,7 @@ public class SimpleDnsServer {
     private final burp.api.montoya.MontoyaApi api;
     private final FakeDnsProperty fakeDnsOption = new FakeDnsProperty();
 
-    // private DnsHandler dnsHandler = null;
-    private Thread dnsServer = null;
+    private DnsHandler dnsServer = null;
 
     /**
      *
@@ -276,11 +276,9 @@ public class SimpleDnsServer {
         }
         FakeDnsProperty option = this.getFakeDnsOption();
         option.setBurpHosts(HostName.getInstance(burpHostList));
-        DnsHandler dnsHandler = new DnsHandler(option);
-        dnsHandler.setEventHandler(this.getEventHandler());
-
         // スレッドを作成して開始
-        this.dnsServer = new Thread(dnsHandler);
+        this.dnsServer = new DnsHandler(option);
+        this.dnsServer.setEventHandler(this.getEventHandler());
         this.dnsServer.start();
 
     }
@@ -302,6 +300,7 @@ public class SimpleDnsServer {
 
     public synchronized void stopServer() {
         if (this.dnsServer != null) {
+            this.dnsServer.terminate();
             this.dnsServer.interrupt();
         }
         this.dnsServer = null;
