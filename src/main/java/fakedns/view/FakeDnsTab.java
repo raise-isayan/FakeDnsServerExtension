@@ -373,8 +373,8 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
         } else {
             if (this.server == null) {
                 this.server = new SimpleDnsServer(null);
+                this.server.setFakeDnsOption(this.getProperty());
             }
-            this.server.setFakeDnsOption(this.getProperty());
             return this.server;
         }
     }

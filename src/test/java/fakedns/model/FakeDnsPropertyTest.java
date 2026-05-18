@@ -1,6 +1,7 @@
 package fakedns.model;
 
 import extension.burp.HostName;
+import fakedns.HostsFileParserTest;
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
@@ -44,8 +45,8 @@ public class FakeDnsPropertyTest {
 
     @Test
     public void testGetBurpAddressForHostIPv4() {
+        System.out.println("testGetBurpAddressForHostIPv4");
         try {
-            System.out.println("testGetBurpAddressForHostIPv4");
             {
                 URI test_host_uri = FakeDnsPropertyTest.class.getResource("/resources/hosts_ipv4").toURI();
                 FakeDnsProperty prop = new FakeDnsProperty();
@@ -68,8 +69,8 @@ public class FakeDnsPropertyTest {
 
     @Test
     public void testGetBurpAddressForHostIPv6() {
+        System.out.println("testGetBurpAddressForHostIPv6");
         try {
-            System.out.println("testGetBurpAddressForHostIPv6");
             {
                 URI test_host_uri = FakeDnsPropertyTest.class.getResource("/resources/hosts_mix").toURI();
                 FakeDnsProperty prop = new FakeDnsProperty();
@@ -133,6 +134,41 @@ public class FakeDnsPropertyTest {
         }
     }
 
+    @Test
+    public void testSetProperty() {
+        System.out.println("testSetProperty");
+        try {
+            URI test_host_uri = HostsFileParserTest.class.getResource("/resources/hosts_ipv4").toURI();
+            FakeDnsProperty instance = new FakeDnsProperty();
+            instance.setDnsPort(453);
+            assertEquals(453, instance.getDnsPort());
+            instance.setDnsTTL(50);
+            assertEquals(50, instance.getDnsTTL());
+            instance.setResolvBurpHosts(false);
+            assertFalse(instance.isResolvBurpHosts());
+            instance.setResolvSystemHosts(false);
+            assertFalse(instance.isResolvSystemHosts());
+            instance.setFakeIPv4("192.168.2.11");
+            assertEquals("192.168.2.11", instance.getFakeIPv4());
+            instance.setFakeIPv6("2001:db8:85a3::8a2e:370:7334");
+            assertEquals("2001:db8:85a3::8a2e:370:7334", instance.getFakeIPv6());
+            HostName burpHosts = HostName.parseHosts(HostName.parseLines(Path.of(test_host_uri)));
+            instance.setBurpHosts(burpHosts);
+
+            FakeDnsProperty prop = new FakeDnsProperty();
+            prop.setProperty(instance);
+            assertEquals(prop.getDnsPort(), instance.getDnsPort());
+            assertEquals(prop.getDnsTTL(), instance.getDnsTTL());
+            assertEquals(prop.isResolvBurpHosts(), instance.isResolvBurpHosts());
+            assertEquals(prop.isResolvSystemHosts(), instance.isResolvSystemHosts());
+            assertEquals(prop.getFakeIPv4(), instance.getFakeIPv4());
+            assertEquals(prop.getFakeIPv6(), instance.getFakeIPv6());
+        } catch (IOException ex) {
+            fail(ex);
+        } catch (URISyntaxException ex) {
+            fail(ex);
+        }
+    }
 
     /**
      * Test of defaultSetting method, of class FakeDnsProperty.

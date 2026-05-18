@@ -97,8 +97,6 @@ public class HostNameItemTest {
         }
     }
 
-
-
     @Test
     public void testParseHostEquals() {
         System.out.println("testParseHostEquals");

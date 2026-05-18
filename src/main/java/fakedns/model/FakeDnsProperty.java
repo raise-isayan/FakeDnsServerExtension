@@ -129,6 +129,10 @@ public class FakeDnsProperty implements FakeDnsOption, IPropertyConfig {
 
     private int dnsTTL = 15;
 
+    public void setDnsTTL(int dnsTTL) {
+        this.dnsTTL = dnsTTL;
+    }
+
     @Override
     public int getDnsTTL() {
         return this.dnsTTL;

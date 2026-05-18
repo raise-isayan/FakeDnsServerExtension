@@ -37,7 +37,7 @@ public class BurpExtension extends BurpExtensionImpl implements ExtensionUnloadi
             String value = pref.getString(config.getSettingName());
             settings.put(config.getSettingName(), value == null ? config.defaultSetting() : value);
             config.saveSetting(settings.get(config.getSettingName()));
-            this.tabFakeDnsTab.getUiComponent().addPropertyChangeListener(config.getSettingName(), newPropertyChangeListener());
+            this.tabFakeDnsTab.getUiComponent().addPropertyChangeListener(config.getSettingName(), this.newPropertyChangeListener());
         }
 
         this.server = new SimpleDnsServer(api);
@@ -63,7 +63,7 @@ public class BurpExtension extends BurpExtensionImpl implements ExtensionUnloadi
         };
     }
 
-    public SimpleDnsServer getServer() {
+    public synchronized SimpleDnsServer getServer() {
         return this.server;
     }
 

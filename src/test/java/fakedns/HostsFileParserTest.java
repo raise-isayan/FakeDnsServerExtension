@@ -135,8 +135,8 @@ public class HostsFileParserTest {
 
     @Test
     public void testHostsFile() {
+        System.out.println("testHostsFile");
         try {
-            System.out.println("testHostsFile");
             URI test_host_uri = HostsFileParserTest.class.getResource("/resources/hosts_ipv4").toURI();
             HostsFileParser hostsParser = new HostsFileParser(Path.of(test_host_uri));
             Optional<InetAddress> host = hostsParser.getAddressForHost(Name.fromString("www.example.com."), Type.A);

@@ -71,12 +71,12 @@ public class DnsHandler extends Thread {
         return fakeDomains.stream().anyMatch(predicate -> predicate.isEnable() && predicate.getHostName().equalsIgnoreCase(queryName.toString(true)));
     }
 
-    private DatagramSocket socket;
+    private DatagramSocket socket = null;
 
     @Override
     public void run() {
         InetSocketAddress bindAddress = new InetSocketAddress(this.option.getBindInterface(), option.getDnsPort());
-        try  {
+        try {
             this.socket = new DatagramSocket(null);
             this.socket.setReuseAddress(true);
             this.socket.bind(bindAddress);
@@ -93,7 +93,7 @@ public class DnsHandler extends Thread {
 
             while (!Thread.currentThread().isInterrupted()) {
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-                socket.receive(packet);
+                this.socket.receive(packet);
                 Message query = new Message(packet.getData());
                 Record question = query.getQuestion();
                 if (question == null) {
@@ -107,11 +107,11 @@ public class DnsHandler extends Thread {
                 if (this.isFakeDomain(queryName)) {
                     // 偽装処理
                     if (queryType == Type.A && !this.option.isEmptyFakeIPv4() && IpUtil.isIPv4Address(this.option.getFakeIPv4())) {
-                        response = this.createResponse(query, question, InetAddress.getByName(this.option.getFakeIPv4()), DnsResolv.FAKE_DOMAIN);
+                        response = this.createResponse(query, question, this.option.asFakeIPv4Address(), DnsResolv.FAKE_DOMAIN);
 //                        this.fireEventMessage("FakeIPv4: " + Type.string(queryType) + " - " + queryName.toString(true) + " [" + this.option.getFakeIPv4() + "]");
                     }
                     if (queryType == Type.AAAA && !this.option.isEmptyFakeIPv6() && IpUtil.isIPv6Address(this.option.getFakeIPv6())) {
-                        response = this.createResponse(query, question, InetAddress.getByName(this.option.getFakeIPv6()), DnsResolv.FAKE_DOMAIN);
+                        response = this.createResponse(query, question, this.option.asFakeIPv6Address(), DnsResolv.FAKE_DOMAIN);
 //                        this.fireEventMessage("FakeIPv6: " + Type.string(queryType) + " - " + queryName.toString(true) + " [" + this.option.getFakeIPv6() + "]");
                     }
                 } else {
@@ -132,16 +132,16 @@ public class DnsHandler extends Thread {
                         }
                     }
                 }
+                if (response == null) {
+                    // 転送（プロキシ）処理
+                    this.fireEventMessage("resolv nameserver: " + Type.string(queryType) + " - " + queryName.toString(true));
+                    response = this.forwardQuery(query);
+                }
                 // レスポンス送信
                 if (response != null) {
                     byte[] respData = response.toWire();
                     DatagramPacket respPacket = new DatagramPacket(respData, respData.length, packet.getAddress(), packet.getPort());
-                    socket.send(respPacket);
-                }
-                else  {
-                    // 転送（プロキシ）処理
-                    this.fireEventMessage("resolv nameserver: " + Type.string(queryType) + " - " + queryName.toString(true));
-                    response = this.forwardQuery(query);
+                    this.socket.send(respPacket);
                 }
             }
         } catch (SocketException ex) {
@@ -149,7 +149,7 @@ public class DnsHandler extends Thread {
         } catch (IOException ex) {
             this.fireEventMessage(Thread.currentThread(), ex);
         } finally {
-            if (!this.socket.isClosed()) {
+            if (this.socket != null && !this.socket.isClosed()) {
                 this.socket.close();
             }
         }
