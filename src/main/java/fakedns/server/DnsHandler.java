@@ -160,7 +160,7 @@ public class DnsHandler extends Thread {
         if (this.socket != null && !this.socket.isClosed()) {
             this.socket.close();
         }
-        Thread.currentThread().interrupt();
+        // Thread.currentThread().interrupt(); // synchronized 内では不可
     }
 
     // 偽装レスポンスの組み立て
