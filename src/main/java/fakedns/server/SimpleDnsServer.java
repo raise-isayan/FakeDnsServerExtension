@@ -19,6 +19,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.net.BindException;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -233,13 +234,17 @@ public class SimpleDnsServer {
                 String exException = "";
                 if (ex instanceof BindException) {
                     exMessage = "Bind Error: " + fakeDnsOption.getBindInterface() + " - " + ex.getMessage();
+                } else if (ex instanceof SocketException) {
+                    exMessage = "Socket Error: " + ex.getMessage();
                     exException = StringUtil.getStackTrace(ex);
                 } else if (ex instanceof IOException) {
-                    exMessage = "Fatal Error: " + StringUtil.getStackTrace(ex.getMessage(), ex);
+                    exMessage = "Fatal Error: " + ex.getMessage();
                     exException = StringUtil.getStackTrace(ex);
                 }
                 System.err.println(exMessage);
-                System.err.println(exException);
+                if (!exException.isEmpty()) {
+                    System.err.println(exException);
+                }
             }
         });
         dnsServer.startServer();

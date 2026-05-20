@@ -9,6 +9,7 @@ import org.xbill.DNS.Record;
 import org.xbill.DNS.hosts.HostsFileParser;
 import java.io.File;
 import java.io.IOException;
+import java.net.BindException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.Inet4Address;
@@ -17,6 +18,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.nio.channels.AsynchronousCloseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -144,8 +146,16 @@ public class DnsHandler extends Thread {
                     this.socket.send(respPacket);
                 }
             }
+        } catch (BindException ex) {
+            this.fireEventMessage(Thread.currentThread(), ex);
         } catch (SocketException ex) {
-            this.fireEventMessage(ex.getMessage());
+            // close の場合はException扱いとしない
+            if (ex.getCause() instanceof AsynchronousCloseException) {
+                this.fireEventMessage(ex.getMessage());
+            }
+            else {
+                this.fireEventMessage(Thread.currentThread(), ex);
+            }
         } catch (IOException ex) {
             this.fireEventMessage(Thread.currentThread(), ex);
         } finally {

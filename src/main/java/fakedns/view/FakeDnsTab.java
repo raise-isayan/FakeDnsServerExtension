@@ -9,6 +9,7 @@ import extension.helpers.IpUtil;
 import extension.helpers.StringUtil;
 import extension.helpers.SwingUtil;
 import extension.view.base.CustomTableModel;
+import extension.view.base.TableColumnRenderer;
 import fakedns.model.HostNameItem;
 import fakedns.model.FakeDnsProperty;
 import fakedns.server.DnsHandler;
@@ -19,6 +20,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.BindException;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -29,6 +31,7 @@ import javax.swing.JToggleButton;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumnModel;
 
 /**
  *
@@ -326,6 +329,12 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
         SwingUtil.addHintText(this.txtFakeIPv6, "0:0:0:0:0:0:0:1");
         SwingUtil.addHintText(this.txtNameServers, "8.8.8.8,8.8.8.4");
 
+        final TableColumnRenderer cellRenderer = new TableColumnRenderer();
+        TableColumnModel model = this.tblFakeDomains.getColumnModel();
+        for (int i = 0; i < model.getColumnCount(); i++) {
+            model.getColumn(i).setCellRenderer(cellRenderer);
+        }
+
         // selected
         this.tblFakeDomains.getColumnModel().getColumn(0).setMinWidth(30);
         this.tblFakeDomains.getColumnModel().getColumn(0).setPreferredWidth(50);
@@ -413,19 +422,26 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
 
             @Override
             public void catchException(Thread t, Throwable ex) {
-                String message = "";
+                String exMessage = "";
+                String exException = "";
                 if (ex instanceof BindException) {
-                    message = "Bind Error: " + option.getBindInterface() + " - " + ex.getMessage();
+                    exMessage = "Bind Error: " + option.getBindInterface() + " - " + ex.getMessage();
+                } else if (ex instanceof SocketException) {
+                    exMessage = "Socket Error: " + ex.getMessage();
                 } else if (ex instanceof IOException) {
-                    message = "Fatal Error: " + StringUtil.getStackTrace(ex.getMessage(), ex);
+                    exMessage = "Fatal Error: " + ex.getMessage();
+                    exException = StringUtil.getStackTrace(ex);
                 }
                 //tglStartServer.setSelected(false);
-                setErrorMessage(message);
+                setErrorMessage(exMessage);
                 if (api() != null) {
                     api().logging().logToError(ex.getMessage(), ex);
                 }
                 else {
-                    System.err.println(message);
+                    System.err.println(exMessage);
+                    if (!exException.isEmpty()) {
+                        System.err.println(exException);
+                    }
                 }
                 tglStartStopServer.setSelected(false);
             }
