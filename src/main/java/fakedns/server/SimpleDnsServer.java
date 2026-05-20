@@ -2,6 +2,7 @@ package fakedns.server;
 
 import burp.BurpPreferences;
 import burp.api.montoya.persistence.Preferences;
+import extend.util.external.NetUtil;
 import extension.burp.BurpConfig;
 import extension.burp.HostName;
 import extension.burp.HostNameEntry;
@@ -19,6 +20,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.net.BindException;
+import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,6 +62,7 @@ public class SimpleDnsServer {
         System.out.println("\t-h, --help - help show");
         System.out.println("\t-v, --version - version show");
         System.out.println("\t-gui - GUI Mode ");
+        System.out.println("\t--bind-list - list of bind interfaces ");
         System.out.println("[command]");
         System.out.println("\t-i, --interface <interface> - Specify the interface IP address.");
         System.out.println("\t--fakeip <fakeip> - Specify the IPv4 address to spoof");
@@ -101,6 +104,13 @@ public class SimpleDnsServer {
                 case "--disable-system-hosts": {
                     fakeDnsOption.setResolvSystemHosts(false);
                     break;
+                }
+                case "--bind-list": {
+                    List<InetAddress> inet = NetUtil.getNetworkInterfaces();
+                    for (InetAddress addr : inet) {
+                        System.out.println(addr.getHostAddress());
+                    }
+                    return;
                 }
                 // --- 引数ありのオプション ---
                 case "-i":

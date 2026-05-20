@@ -249,10 +249,8 @@ public class DnsHandler extends Thread {
             // システムリゾルバへクエリをそのまま送信
             return this.systemResolver.send(query);
         } catch (IOException ex) {
-            if (this.messageHandler != null) {
-                this.messageHandler.catchException(Thread.currentThread(), ex);
-            }
-            System.err.println(getLogName() + "Forwarding failed: " + ex.getMessage());
+            this.fireEventMessage(Thread.currentThread(), ex);
+            System.err.println(this.getLogName() + "Forwarding failed: " + ex.getMessage());
             return null;
         }
     }
@@ -277,7 +275,7 @@ public class DnsHandler extends Thread {
 
     public void fireEventMessage(String message) {
         if (this.messageHandler != null) {
-            this.messageHandler.message(getLogName() + message);
+            this.messageHandler.message(this.getLogName() + message);
         }
     }
 
