@@ -1,5 +1,6 @@
 package fakedns.model;
 
+import extend.util.external.NetUtil;
 import extension.burp.HostName;
 import fakedns.HostsFileParserTest;
 import java.io.IOException;
@@ -52,12 +53,12 @@ public class FakeDnsPropertyTest {
                 FakeDnsProperty prop = new FakeDnsProperty();
                 HostName burpHosts = HostName.parseHosts(HostName.parseLines(Path.of(test_host_uri)));
                 prop.setBurpHosts(burpHosts);
-                Optional<InetAddress> entry = prop.getBurpAddressForHost("www.example.com", FakeDnsProperty.IPv4_FAMILY);
+                Optional<InetAddress> entry = prop.getBurpAddressForHost("www.example.com", NetUtil.IPv4_FAMILY);
                 assertTrue(entry.isPresent());
                 if (entry.isPresent()) {
                     System.out.println("addr:" + entry.get().getHostAddress());
                 }
-                Optional<InetAddress> notfound = prop.getBurpAddressForHost("www.example.com", FakeDnsProperty.IPv6_FAMILY);
+                Optional<InetAddress> notfound = prop.getBurpAddressForHost("www.example.com", NetUtil.IPv6_FAMILY);
                 assertTrue(notfound.isEmpty());
             }
         } catch (URISyntaxException ex) {
@@ -76,13 +77,13 @@ public class FakeDnsPropertyTest {
                 FakeDnsProperty prop = new FakeDnsProperty();
                 HostName burpHosts = HostName.parseHosts(HostName.parseLines(Path.of(test_host_uri)));
                 prop.setBurpHosts(burpHosts);
-                Optional<InetAddress> entryv4 = prop.getBurpAddressForHost("www.example.jp", FakeDnsProperty.IPv4_FAMILY);
+                Optional<InetAddress> entryv4 = prop.getBurpAddressForHost("www.example.jp", NetUtil.IPv4_FAMILY);
                 assertTrue(entryv4.isPresent());
                 if (entryv4.isPresent()) {
                     System.out.println("addrv4:" + entryv4.get().getHostAddress());
                     assertEquals("198.51.100.1", entryv4.get().getHostAddress());
                 }
-                Optional<InetAddress> entryv6 = prop.getBurpAddressForHost("www.example.jp", FakeDnsProperty.IPv6_FAMILY);
+                Optional<InetAddress> entryv6 = prop.getBurpAddressForHost("www.example.jp", NetUtil.IPv6_FAMILY);
                 assertTrue(entryv6.isPresent());
                 if (entryv6.isPresent()) {
                     assertEquals("2001:db8:3333:4444:5555:6666:7777:8888", entryv6.get().getHostAddress());

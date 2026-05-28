@@ -90,11 +90,7 @@ public class ThreadServerTest {
         try {
             Boolean result = this.future.get(Long.MAX_VALUE, TimeUnit.SECONDS);
             System.out.println("join:" + result);
-        } catch (InterruptedException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (ExecutionException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (TimeoutException ex) {
+        } catch (InterruptedException | ExecutionException | TimeoutException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }

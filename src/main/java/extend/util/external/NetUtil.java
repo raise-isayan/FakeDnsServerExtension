@@ -19,6 +19,9 @@ public class NetUtil {
 
     private final static Logger logger = Logger.getLogger(NetUtil.class.getName());
 
+    public static final int IPv4_FAMILY = 4;
+    public static final int IPv6_FAMILY = 6;
+
     public static final String ALL_IPv4 = "0.0.0.0";
     public static final String LOCAL_IPv4 = "127.0.0.1";
     public static final String LOCAL_IPv6 = "0:0:0:0:0:0:0:1";
@@ -47,4 +50,5 @@ public class NetUtil {
         }
         return inet;
     }
+
 }

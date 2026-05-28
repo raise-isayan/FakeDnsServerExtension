@@ -15,7 +15,6 @@ import fakedns.view.FakeDnsTab;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
@@ -379,7 +378,7 @@ public class SimpleDnsServer {
                     }
                 });
             } catch (UnsupportedLookAndFeelException ignored) {
-                Toolkit.getDefaultToolkit().beep();
+                logger.log(Level.SEVERE, ignored.getMessage(), ignored);
             } catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
                 System.err.println(StringUtil.getStackTrace(ex.getMessage(), ex));

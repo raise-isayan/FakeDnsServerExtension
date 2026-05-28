@@ -16,12 +16,16 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author isayan
  */
 public class FakeDnsProperty implements FakeDnsOption, IPropertyConfig {
+
+    private final static Logger logger = Logger.getLogger(FakeDnsProperty.class.getName());
 
     public final static String FAKEDNS_PROPERTY = "FakeDns";
 
@@ -145,15 +149,16 @@ public class FakeDnsProperty implements FakeDnsOption, IPropertyConfig {
             try {
                 for (HostNameEntry entry : entrys) {
                     InetAddress addr = entry.asHostInetAddress();
-                    if (family == IPv4_FAMILY && addr instanceof Inet4Address) {
+                    if (family == NetUtil.IPv4_FAMILY && addr instanceof Inet4Address) {
                         return Optional.of(addr);
                     }
-                    if (family == IPv6_FAMILY && addr instanceof Inet6Address) {
+                    if (family == NetUtil.IPv6_FAMILY && addr instanceof Inet6Address) {
                         return Optional.of(addr);
                     }
                 }
             } catch (UnknownHostException ex) {
                 // nothing
+                logger.log(Level.INFO, ex.getMessage(), ex);
             }
         }
         return Optional.empty();

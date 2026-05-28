@@ -46,7 +46,7 @@ FakeDnsServerExtension tab will be added to Burp Suite.
   <dd>Specify the IP(IPv4 and IPv6) address to spoof</dd>
 
   <dt>Name servers:</dt>
-  <dd>Specify the name server/dd>
+  <dd>Specify the name server</dd>
   <dd>(ex) 8.8.8.8,8.8.8.4</dd>
 
   <dt>[resolv burp hosts] Check box:</dt>
@@ -111,6 +111,11 @@ Usage: java -jar FakeDnsServerExtension.jar [option] [-i, --interface <interface
         --disable-system-hosts - Disable DNS name resolution using the system hosts file
 ````
 
+[command (ex)]
+````
+java -jar FakeDnsServerExtension.jar -i 192.168.137.1 --fakeip  192.168.137.1 --fakedomains www.example.com,www.example.jp
+````
+
 #### CAUTION:
 
 In command-line mode, `resolv burp hosts` is always disabled.
@@ -139,7 +144,7 @@ gradlew release
 * v2024.2.1.3 or higher (http://www.portswigger.net/burp/)
 
 ## Development environment
-* NetBean 28 (https://netbeans.apache.org/)
+* NetBean 30 (https://netbeans.apache.org/)
 * Gradle 8.5 (https://gradle.org/)
 
 ## Required Library

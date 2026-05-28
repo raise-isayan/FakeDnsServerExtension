@@ -110,6 +110,11 @@ Usage: java -jar FakeDnsServerExtension.jar [option] [-i, --interface <interface
         --disable-system-hosts - Disable DNS name resolution using the system hosts file
 ````
 
+[コマンド(例)]
+````
+java -jar FakeDnsServerExtension.jar -i 192.168.137.1 --fakeip  192.168.137.1 --fakedomains www.example.com,www.example.jp
+````
+
 #### CAUTION:
 
 コマンドラインモード時は、resolv burp hosts は常に無効です。
@@ -137,7 +142,7 @@ gradlew release
 * v2024.2.1.3 or higher (http://www.portswigger.net/burp/)
 
 ## 開発環境
-* NetBean 28 (https://netbeans.apache.org/)
+* NetBean 30 (https://netbeans.apache.org/)
 * Gradle 8.5 (https://gradle.org/)
 
 ## 必須ライブラリ

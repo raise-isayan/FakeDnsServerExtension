@@ -1,5 +1,6 @@
 package fakedns.server;
 
+import extend.util.external.NetUtil;
 import extension.burp.HostName;
 import extension.helpers.IpUtil;
 import fakedns.model.FakeDnsProperty;
@@ -119,7 +120,7 @@ public class DnsHandler extends Thread {
                 } else {
                     // Burp のHost
                     if (response == null && this.option.isResolvBurpHosts()) {
-                        int family = (queryType == Type.AAAA) ? FakeDnsProperty.IPv6_FAMILY : FakeDnsProperty.IPv4_FAMILY;
+                        int family = (queryType == Type.AAAA) ? NetUtil.IPv6_FAMILY : NetUtil.IPv4_FAMILY;
                         Optional<InetAddress> burpHostIP = this.option.getBurpAddressForHost(queryName.toString(true), family);
                         if (burpHostIP.isPresent()) {
                             response = this.createResponse(query, question, burpHostIP.get(), DnsResolv.BURP_HOSTS);

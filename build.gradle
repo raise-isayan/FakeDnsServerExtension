@@ -69,7 +69,7 @@ task release(type: Zip, dependsOn: ['build']) {
 }
 
 dependencies {
-    // https://mvnrepository.com/artifact/org.slf4j/slf4j-nop/1.7.36
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-nop
     implementation 'org.slf4j:slf4j-nop:2.0.18'
 
     // https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk18on
@@ -85,7 +85,7 @@ dependencies {
     implementation 'net.portswigger.burp.extensions:montoya-api:2026.4'
 
     // Source: https://mvnrepository.com/artifact/dnsjava/dnsjava
-    implementation 'dnsjava:dnsjava:3.6.4'
+    implementation 'dnsjava:dnsjava:3.6.5'
 
     // Use JUnit Jupiter for testing.
     // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
