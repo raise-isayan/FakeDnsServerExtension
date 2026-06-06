@@ -13,6 +13,7 @@ import extension.view.base.TableColumnRenderer;
 import fakedns.model.HostNameItem;
 import fakedns.model.FakeDnsProperty;
 import fakedns.server.DnsHandler;
+import fakedns.server.MessageHandler;
 import fakedns.server.SimpleDnsServer;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -70,6 +71,7 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
         btnInterfaces = new javax.swing.JButton();
         lblFakeIP = new javax.swing.JLabel();
         txtFakeIPv4 = new javax.swing.JTextField();
+        txtFakeIPv6 = new javax.swing.JTextField();
         chkResolvSystemHost = new javax.swing.JCheckBox();
         chkResolvBurpHost = new javax.swing.JCheckBox();
         lblNameServers = new javax.swing.JLabel();
@@ -83,7 +85,6 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
         btnEditDomain = new javax.swing.JButton();
         btnRemoveDomain = new javax.swing.JButton();
         btnRemoveAllDomain = new javax.swing.JButton();
-        txtFakeIPv6 = new javax.swing.JTextField();
 
         setPreferredSize(new java.awt.Dimension(800, 600));
         setLayout(new java.awt.BorderLayout());
@@ -142,6 +143,12 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
         txtFakeIPv4.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
                 txtFakeIPv4FocusLost(evt);
+            }
+        });
+
+        txtFakeIPv6.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtFakeIPv6FocusLost(evt);
             }
         });
 
@@ -228,12 +235,6 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
         btnRemoveAllDomain.setMinimumSize(new java.awt.Dimension(10, 22));
         btnRemoveAllDomain.setPreferredSize(new java.awt.Dimension(100, 22));
         btnRemoveAllDomain.addActionListener(this::btnRemoveAllDomainActionPerformed);
-
-        txtFakeIPv6.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                txtFakeIPv6FocusLost(evt);
-            }
-        });
 
         javax.swing.GroupLayout pnlMainLayout = new javax.swing.GroupLayout(pnlMain);
         pnlMain.setLayout(pnlMainLayout);
@@ -408,7 +409,7 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
         this.setErrorMessage("");
         final FakeDnsProperty option = this.getProperty();
         final SimpleDnsServer server = this.getDnsServerInstance();
-        server.setEventHandler(new DnsHandler.MessageHandler() {
+        server.setEventHandler(new MessageHandler() {
 
             @Override
             public void message(String message) {

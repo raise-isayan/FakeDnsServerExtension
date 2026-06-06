@@ -4,6 +4,7 @@ import extension.helpers.StringUtil;
 import fakedns.model.FakeDnsProperty;
 import fakedns.model.HostNameItem;
 import fakedns.server.DnsHandler;
+import fakedns.server.MessageHandler;
 import java.io.IOException;
 import java.net.BindException;
 import java.util.List;
@@ -41,7 +42,7 @@ public class ThreadServerTest {
 
     public void startThread() {
         final DnsHandler dnsHandler = new DnsHandler(this.option);
-        dnsHandler.setEventHandler(new DnsHandler.MessageHandler() {
+        dnsHandler.setEventHandler(new MessageHandler() {
 
             @Override
             public void message(String message) {
@@ -64,7 +65,7 @@ public class ThreadServerTest {
 
     public void startExecute() {
         final DnsHandler dnsHandler = new DnsHandler(this.option);
-        dnsHandler.setEventHandler(new DnsHandler.MessageHandler() {
+        dnsHandler.setEventHandler(new MessageHandler() {
 
             @Override
             public void message(String message) {

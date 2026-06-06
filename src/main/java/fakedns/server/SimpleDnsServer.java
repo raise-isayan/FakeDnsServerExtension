@@ -230,7 +230,7 @@ public class SimpleDnsServer {
         // ハンドラー（Runnable）を作成
         SimpleDnsServer dnsServer = new SimpleDnsServer();
         dnsServer.setFakeDnsOption(fakeDnsOption);
-        dnsServer.setEventHandler(new DnsHandler.MessageHandler() {
+        dnsServer.setEventHandler(new MessageHandler() {
 
             @Override
             public void message(String message) {
@@ -334,13 +334,13 @@ public class SimpleDnsServer {
         this.fakeDnsOption.setProperty(fakeDnsOption);
     }
 
-    private DnsHandler.MessageHandler messageHandler = null;
+    private MessageHandler messageHandler = null;
 
-    public DnsHandler.MessageHandler getEventHandler() {
+    public MessageHandler getEventHandler() {
         return this.messageHandler;
     }
 
-    public void setEventHandler(DnsHandler.MessageHandler messageHandler) {
+    public void setEventHandler(MessageHandler messageHandler) {
         this.messageHandler = messageHandler;
     }
 

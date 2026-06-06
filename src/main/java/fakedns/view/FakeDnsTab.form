@@ -236,6 +236,11 @@
             <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtFakeIPv4FocusLost"/>
           </Events>
         </Component>
+        <Component class="javax.swing.JTextField" name="txtFakeIPv6">
+          <Events>
+            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtFakeIPv6FocusLost"/>
+          </Events>
+        </Component>
         <Component class="javax.swing.JCheckBox" name="chkResolvSystemHost">
           <Properties>
             <Property name="text" type="java.lang.String" value="resolv system hosts"/>
@@ -427,11 +432,6 @@
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnRemoveAllDomainActionPerformed"/>
-          </Events>
-        </Component>
-        <Component class="javax.swing.JTextField" name="txtFakeIPv6">
-          <Events>
-            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtFakeIPv6FocusLost"/>
           </Events>
         </Component>
       </SubComponents>

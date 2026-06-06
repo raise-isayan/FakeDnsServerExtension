@@ -57,7 +57,7 @@ public class DnsHandler extends Thread {
             try {
                 this.systemResolver = new ExtendedResolver(HostNameItem.toHostArray(this.option.getNameServers()));
             } catch (UnknownHostException ex) {
-                this.fireEventMessage(Thread.currentThread(), ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
         File hostsFile = HostName.getSystemHostFile();
@@ -252,16 +252,8 @@ public class DnsHandler extends Thread {
         } catch (IOException ex) {
             this.fireEventMessage(Thread.currentThread(), ex);
             System.err.println(this.getLogName() + "Forwarding failed: " + ex.getMessage());
-            return null;
         }
-    }
-
-    public interface MessageHandler {
-
-        public void message(String message);
-
-        public void catchException(Thread t, Throwable e);
-
+        return null;
     }
 
     private MessageHandler messageHandler = null;
