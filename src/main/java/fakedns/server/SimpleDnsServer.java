@@ -79,6 +79,7 @@ public class SimpleDnsServer {
         args = new String[]{"-i","192.168.137.1", "--fakeip", "192.168.137.1", "--fakeipv6", "::1", "--fakedomains", "www.example.com,www.example.jp"};
      */
     public static void main(String[] args) {
+        args = new String[]{"-gui"};
 
         final FakeDnsProperty fakeDnsOption = new FakeDnsProperty();
 
@@ -350,9 +351,14 @@ public class SimpleDnsServer {
 
         private MainPanel() {
             super(new BorderLayout());
-            Preferences pref = BurpPreferences.extensions(SimpleDnsServer.getProjectName());
             FakeDnsProperty option = new FakeDnsProperty();
-            option.saveSetting(pref.getString(option.getSettingName()));
+            Preferences pref = BurpPreferences.extensions(SimpleDnsServer.getProjectName());
+            if (pref != null && pref.getString(option.getSettingName()) != null) {
+                option.saveSetting(pref.getString(option.getSettingName()));
+            }
+            else {
+                option.saveSetting(option.defaultSetting());
+            }
             this.fakeDnsTab.setProperty(option);
             this.fakeDnsTab.setStandalone(true);
             this.add(this.fakeDnsTab, BorderLayout.CENTER);
@@ -373,7 +379,7 @@ public class SimpleDnsServer {
                     @Override
                     public void windowClosing(WindowEvent e) {
                         FakeDnsProperty option = main.fakeDnsTab.getProperty();
-                        Preferences pref = BurpPreferences.extensions(SimpleDnsServer.getProjectName());
+                        Preferences pref = BurpPreferences.extensions(SimpleDnsServer.getProjectName(), true);
                         pref.setString(option.getSettingName(), option.loadSetting());
                     }
                 });
