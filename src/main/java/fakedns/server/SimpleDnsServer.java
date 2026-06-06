@@ -79,7 +79,6 @@ public class SimpleDnsServer {
         args = new String[]{"-i","192.168.137.1", "--fakeip", "192.168.137.1", "--fakeipv6", "::1", "--fakedomains", "www.example.com,www.example.jp"};
      */
     public static void main(String[] args) {
-        args = new String[]{"-gui"};
 
         final FakeDnsProperty fakeDnsOption = new FakeDnsProperty();
 

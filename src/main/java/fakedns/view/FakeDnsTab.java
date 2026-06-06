@@ -32,6 +32,7 @@ import javax.swing.JToggleButton;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
 /**
@@ -330,10 +331,11 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
         SwingUtil.addHintText(this.txtFakeIPv6, "0:0:0:0:0:0:0:1");
         SwingUtil.addHintText(this.txtNameServers, "8.8.8.8,8.8.8.4");
 
-        final TableColumnRenderer cellRenderer = new TableColumnRenderer();
         TableColumnModel model = this.tblFakeDomains.getColumnModel();
         for (int i = 0; i < model.getColumnCount(); i++) {
-            model.getColumn(i).setCellRenderer(cellRenderer);
+            Class<?> columnClass = this.tblFakeDomains.getColumnClass(i);
+            TableCellRenderer defaultRenderer = this.tblFakeDomains.getDefaultRenderer(columnClass);
+            model.getColumn(i).setCellRenderer(new TableColumnRenderer(defaultRenderer));
         }
 
         // selected
@@ -343,8 +345,8 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
 
         // Domain
         this.tblFakeDomains.getColumnModel().getColumn(1).setMinWidth(100);
-        this.tblFakeDomains.getColumnModel().getColumn(1).setPreferredWidth(200);
-        this.tblFakeDomains.getColumnModel().getColumn(1).setMaxWidth(300);
+        this.tblFakeDomains.getColumnModel().getColumn(1).setPreferredWidth(500);
+        this.tblFakeDomains.getColumnModel().getColumn(1).setMaxWidth(1000);
 
         // IP
         this.tblFakeDomains.getColumnModel().getColumn(2).setMinWidth(0);
