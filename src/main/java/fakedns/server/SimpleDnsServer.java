@@ -70,6 +70,8 @@ public class SimpleDnsServer {
         System.out.println("\t--nameservers <NameServers>  - Specify the name server");
         System.out.println("\t--p, -port <dnsPort> - Specify the DNS port");
         System.out.println("\t--disable-system-hosts - Disable DNS name resolution using the system hosts file");
+        System.out.println("[ex]");
+        System.out.println(String.format("java -jar %s.jar -i 192.0.2.11 --fakeip 192.0.2.11 --fakeipv6 2001:db8:85a3::8a2e:370:7334 --fakedomains www.example.com --nameservers 8.8.8.8,8.8.8.4 --port 8453", getProjectName()));
         System.out.println("");
     }
 
