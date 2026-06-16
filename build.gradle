@@ -14,13 +14,6 @@ application {
     mainClass = 'fakedns.server.SimpleDnsServer'
 }
 
-// Apply a specific Java toolchain to ease working on different environments.
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
-}
-
 shadowJar {
 //   exclude 'META-INF/*.SF'
 //   exclude 'META-INF/*.DSA'
@@ -91,6 +84,13 @@ dependencies {
     // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
 
+}
+
+// Apply a specific Java toolchain to ease working on different environments.
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }
 
 tasks.withType(JavaCompile) {

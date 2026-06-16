@@ -5,6 +5,7 @@ import burp.api.montoya.MontoyaApi;
 import extend.util.external.NetUtil;
 import java.awt.Component;
 import extension.burp.IBurpTab;
+import extension.helpers.DateUtil;
 import extension.helpers.IpUtil;
 import extension.helpers.StringUtil;
 import extension.helpers.SwingUtil;
@@ -12,7 +13,6 @@ import extension.view.base.CustomTableModel;
 import extension.view.base.TableColumnRenderer;
 import fakedns.model.HostNameItem;
 import fakedns.model.FakeDnsProperty;
-import fakedns.server.DnsHandler;
 import fakedns.server.MessageHandler;
 import fakedns.server.SimpleDnsServer;
 import java.awt.Point;
@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.net.BindException;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -413,13 +415,17 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
         final SimpleDnsServer server = this.getDnsServerInstance();
         server.setEventHandler(new MessageHandler() {
 
+            public String getLogDate() {
+                return SimpleDnsServer.LOG_TIMESTAMP_DATEFORMAT.withZone(DateUtil.ZONE_OFFSET_GMT).format(ZonedDateTime.now());
+            }
+
             @Override
             public void message(String message) {
                 if (api() != null) {
-                    api().logging().logToOutput(message);
+                    api().logging().logToOutput(getLogDate() + message);
                 }
                 else {
-                    System.out.println(message);
+                    System.out.println(getLogDate() + message);
                 }
             }
 
@@ -438,10 +444,10 @@ public class FakeDnsTab extends javax.swing.JPanel implements IBurpTab {
                 //tglStartServer.setSelected(false);
                 setErrorMessage(exMessage);
                 if (api() != null) {
-                    api().logging().logToError(ex.getMessage(), ex);
+                    api().logging().logToError(getLogDate() + ex.getMessage(), ex);
                 }
                 else {
-                    System.err.println(exMessage);
+                    System.err.println(getLogDate() + exMessage);
                     if (!exException.isEmpty()) {
                         System.err.println(exException);
                     }

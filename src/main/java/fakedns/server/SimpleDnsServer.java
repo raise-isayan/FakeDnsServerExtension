@@ -7,6 +7,7 @@ import extension.burp.BurpConfig;
 import extension.burp.HostName;
 import extension.burp.HostNameEntry;
 import extension.helpers.ConvertUtil;
+import extension.helpers.DateUtil;
 import extension.helpers.IpUtil;
 import extension.helpers.StringUtil;
 import fakedns.model.HostNameItem;
@@ -21,6 +22,8 @@ import java.io.IOException;
 import java.net.BindException;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -74,6 +77,8 @@ public class SimpleDnsServer {
         System.out.println(String.format("java -jar %s.jar -i 192.0.2.11 --fakeip 192.0.2.11 --fakeipv6 2001:db8:85a3::8a2e:370:7334 --fakedomains www.example.com --nameservers 8.8.8.8,8.8.8.4 --port 8453", getProjectName()));
         System.out.println("");
     }
+
+    public final static DateTimeFormatter LOG_TIMESTAMP_DATEFORMAT = DateTimeFormatter.ofPattern("'['yyyyMMdd HH:mm:ss'-GMT]' ");
 
     /*
         args = new String[]{"-gui"};
@@ -234,9 +239,13 @@ public class SimpleDnsServer {
         dnsServer.setFakeDnsOption(fakeDnsOption);
         dnsServer.setEventHandler(new MessageHandler() {
 
+            public String getLogDate() {
+                return LOG_TIMESTAMP_DATEFORMAT.withZone(DateUtil.ZONE_OFFSET_GMT).format(ZonedDateTime.now());
+            }
+
             @Override
             public void message(String message) {
-                System.out.println(message);
+                System.out.println(getLogDate() + message);
             }
 
             @Override
@@ -252,7 +261,7 @@ public class SimpleDnsServer {
                     exMessage = "Fatal Error: " + ex.getMessage();
                     exException = StringUtil.getStackTrace(ex);
                 }
-                System.err.println(exMessage);
+                System.err.println(getLogDate() + exMessage);
                 if (!exException.isEmpty()) {
                     System.err.println(exException);
                 }
