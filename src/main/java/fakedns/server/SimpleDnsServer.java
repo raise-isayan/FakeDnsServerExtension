@@ -277,6 +277,7 @@ public class SimpleDnsServer {
     private final FakeDnsProperty fakeDnsOption = new FakeDnsProperty();
 
     private DnsHandler dnsServer = null;
+    private Thread shutdownHook = null;
 
     /**
      *
@@ -303,6 +304,13 @@ public class SimpleDnsServer {
         option.setBurpHosts(HostName.getInstance(burpHostList));
         // スレッドを作成して開始
         this.dnsServer = new DnsHandler(option);
+        this.shutdownHook = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                dnsServer.terminate();
+            }
+        });
+        Runtime.getRuntime().addShutdownHook(this.shutdownHook);
         this.dnsServer.setEventHandler(this.getEventHandler());
         this.dnsServer.start();
 
@@ -327,6 +335,13 @@ public class SimpleDnsServer {
         if (this.dnsServer != null) {
             this.dnsServer.terminate();
             this.dnsServer.interrupt();
+            if (this.shutdownHook != null) {
+                try {
+                    Runtime.getRuntime().removeShutdownHook(this.shutdownHook);
+                } catch (IllegalStateException ex) {
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
+                }
+            }
         }
         this.dnsServer = null;
     }

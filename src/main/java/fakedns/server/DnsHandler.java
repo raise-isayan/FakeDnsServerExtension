@@ -84,12 +84,6 @@ public class DnsHandler extends Thread {
             this.socket.setReuseAddress(true);
             this.socket.bind(bindAddress);
 //            socket.setSoTimeout(1000);
-            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    terminate();
-                }
-            }));
 
             this.fireEventMessage("Accept DNS: " + bindAddress.getHostString() + ":" + bindAddress.getPort());
             byte[] buffer = new byte[UDP_SIZE];
@@ -167,7 +161,7 @@ public class DnsHandler extends Thread {
 
     }
 
-    public synchronized void terminate() {
+    synchronized void terminate() {
         if (this.socket != null && !this.socket.isClosed()) {
             this.socket.close();
         }
