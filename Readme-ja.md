@@ -143,7 +143,7 @@ gradlew release
 
 ## 開発環境
 * NetBean 30 (https://netbeans.apache.org/)
-* Gradle 8.5 (https://gradle.org/)
+* Gradle 9.6.1 (https://gradle.org/)
 
 ## 必須ライブラリ
 ビルドには別途 [BurpExtensionCommons](https://github.com/raise-isayan/BurpExtensionCommons) のライブラリを必要とします。
